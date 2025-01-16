@@ -1,0 +1,39 @@
+# ROS 2 build directories at any level
+**/build/
+**/install/
+**/log/
+
+# Log files (if stored in a separate log folder)
+*.log
+
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Python virtual environment
+venv/
+.env/
+
+# CMake build files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# ROS 2 specific
+*.rosinstall
+*.rosdep
+
+# VS Code settings (optional, if you're using VS Code)
+.vscode/
+
+# PyCharm settings (optional, if you're using PyCharm)
+.idea/
+
+# Miscellaneous
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# Ignore .lgd-nfy0 file
+.lgd-nfy0
