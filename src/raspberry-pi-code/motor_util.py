@@ -9,7 +9,7 @@ from feetech_tuna import FeetechTuna
 
 # Define servo pairs
 SERVO_PAIRS = [
-    (0, 20),
+    (40, 20),
     (1, 21),
     (2, 22),
     (3, 23),
