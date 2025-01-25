@@ -9,6 +9,7 @@ from feetech_tuna import FeetechTuna
 
 # Define servo pairs
 SERVO_PAIRS = [
+    (0, 20),
     (1, 21),
     (2, 22),
     (3, 23),
@@ -16,6 +17,7 @@ SERVO_PAIRS = [
     (5, 25),
     (6, 26),
     (7, 27),
+    (10, 30),
     (11, 31),
     (12, 32),
     (13, 33),
@@ -23,6 +25,7 @@ SERVO_PAIRS = [
     (15, 35),
     (16, 36),
     (17, 37)
+    (18, 38)
 ]
 
 # Motors to reverse directions
