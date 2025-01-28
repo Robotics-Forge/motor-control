@@ -88,13 +88,15 @@ def handle_keyboard(controller):
     print("Servo 27: 8/i    Servo 37: h/n")
     print("Servo 38: j/m")
 
+    # Set to keep track of currently pressed keys
+    pressed_keys = set()
+
     def on_press(key):
         try:
             key_char = key.char
+            pressed_keys.add(key_char)
         except AttributeError:
             return
-
-        step_size = controller.get_step_size()
 
         # Define key-to-servo mappings and their position changes
         key_mappings = {
@@ -117,13 +119,27 @@ def handle_keyboard(controller):
             'j': (38, controller.get_step_size(38)), 'm': (38, -controller.get_step_size(38)),
         }
 
-        if key_char in key_mappings:
-            servo_id, change = key_mappings[key_char]
-            current_pos = controller.get_servo_positions([servo_id])[servo_id]
-            new_pos = current_pos + change
-            controller.set_servo_positions({servo_id: new_pos})
+        # Process all currently pressed keys
+        position_updates = {}
+        for key_char in pressed_keys:
+            if key_char in key_mappings:
+                servo_id, change = key_mappings[key_char]
+                current_pos = controller.get_servo_positions([servo_id])[servo_id]
+                new_pos = current_pos + change
+                position_updates[servo_id] = new_pos
 
-    with keyboard.Listener(on_press=on_press) as listener:
+        # Update all affected servos at once
+        if position_updates:
+            controller.set_servo_positions(position_updates)
+
+    def on_release(key):
+        try:
+            key_char = key.char
+            pressed_keys.discard(key_char)
+        except AttributeError:
+            return
+
+    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
 
 def handle_teleoperation(controller, client_socket):
