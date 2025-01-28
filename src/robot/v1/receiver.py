@@ -1,5 +1,12 @@
 import socket
 import serial.tools.list_ports
+import sys
+import os
+
+# Add the motor-control directory to the path
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'motor-control'))
+sys.path.append(path)
+
 from motor_control import MotorController
 
 # Network configuration
