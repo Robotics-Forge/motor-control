@@ -2,17 +2,18 @@ import os
 import sys
 import time
 from typing import Dict, List, Set, Tuple, Optional
-from feetech_tuna import FeetechTuna
 
 # Add the feetech-tuna directory to the path
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'feetech-tuna'))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), '.', 'feetech-tuna'))
 sys.path.append(path)
+
+# Import after adding to path
+from feetech_tuna import FeetechTuna
 
 class MotorController:
 
     # Constants
-    SERVO_PAIRS: List[Tuple[int, int]] =
-    [
+    SERVO_PAIRS: List[Tuple[int, int]] = [
         (40, 20),
         (1, 21),
         (2, 22),

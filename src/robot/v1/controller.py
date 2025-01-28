@@ -9,6 +9,7 @@ from pynput import keyboard
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'motor-control'))
 sys.path.append(path)
 
+# Import MotorController after adding to path
 from motor_control import MotorController
 
 # Network configuration
