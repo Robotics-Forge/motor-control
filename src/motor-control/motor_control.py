@@ -136,12 +136,12 @@ class MotorController:
             for servo_id in servo_ids
         }
 
-    def set_servo_positions(self, servo_ids: List[int], positions: Dict[int, int]) -> None:
+    def set_servo_positions(self, positions: Dict[int, int]) -> None:
         """Set the position for a list of servos."""
         for servo_id, position in positions.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
-    def get_step_size(self, servo_id: Optional[int]) -> int:
+    def get_step_size(self, servo_id: Optional[int] = None) -> int:
         """
         Get the step size for a servo, adjusted by its multiplier if applicable.
 
