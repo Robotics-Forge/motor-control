@@ -51,8 +51,8 @@ def main():
         port_index = int(input("Select the COM port (number): ")) - 1
         selected_port = available_ports[port_index]
 
-        controller = MotorController(port=selected_port, baudrate=1000000)
-        if not controller.connect():
+        controller = MotorController()
+        if not controller.connect(port=selected_port, baudrate=1000000):
             print(f"Failed to open port {selected_port}")
             return
         controller.initialize_motors()

@@ -47,7 +47,7 @@ def main():
     controller = MotorController()
     try:
         # Connect to serial port
-        if not controller.connect(port=selected_port):
+        if not controller.connect(port=selected_port, baudrate=1000000):
             print(f"Failed to open serial port {selected_port}.")
             return
 
