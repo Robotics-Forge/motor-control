@@ -4,7 +4,7 @@ import time
 from typing import Dict, List, Set, Tuple, Optional
 
 # Add the feetech-tuna directory to the path
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), '.', 'feetech-tuna'))
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'feetech-tuna'))
 sys.path.append(path)
 
 # Import after adding to path

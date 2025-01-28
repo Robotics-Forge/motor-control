@@ -9,6 +9,8 @@ The system consists of two main components:
 -   A receiver program that runs on the robot
 -   A controller program that runs on the control device (e.g., computer, remote control)
 
+Note: For keyboard control, the controller program must be run directly on the robot.
+
 ## Setup Instructions
 
 ### On the Robot
@@ -18,8 +20,14 @@ The system consists of two main components:
     ```bash
     python receiver.py
     ```
+3. For keyboard control only: Run the controller program on the robot itself:
+    ```bash
+    python controller.py
+    ```
 
 ### On the Control Device
+
+(Only for remote control, not keyboard control)
 
 1. Navigate to the project directory
 2. Run the controller program:
