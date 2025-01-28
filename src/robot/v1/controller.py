@@ -94,7 +94,7 @@ def handle_keyboard(controller):
         except AttributeError:
             return
 
-        step_size = 10  # Adjust as needed
+        step_size = 50  # Adjust as needed
 
         # Define key-to-servo mappings and their position changes
         key_mappings = {
