@@ -4,11 +4,12 @@ import sys
 import os
 import socket
 from pynput import keyboard
-from motor_control import MotorController
 
 # Add the motor-control directory to the path
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'motor-control'))
 sys.path.append(path)
+
+from motor_control import MotorController
 
 # Network configuration
 RECEIVER_IP = "192.168.1.171"
