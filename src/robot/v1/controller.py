@@ -55,7 +55,7 @@ def main():
         if not controller.connect(port=selected_port, baudrate=1000000):
             print(f"Failed to open port {selected_port}")
             return
-        controller.initialize_motors()
+        controller.initialize_servos()
 
         if mode == 2:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
