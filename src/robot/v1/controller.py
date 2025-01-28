@@ -94,27 +94,27 @@ def handle_keyboard(controller):
         except AttributeError:
             return
 
-        step_size = 10  # Adjust as needed
+        step_size = controller.get_step_size()
 
         # Define key-to-servo mappings and their position changes
         key_mappings = {
-            '1': (20, step_size), 'q': (20, -step_size),
-            '2': (21, step_size), 'w': (21, -step_size),
-            '3': (22, step_size), 'e': (22, -step_size),
-            '4': (23, step_size), 'r': (23, -step_size),
-            '5': (24, step_size), 't': (24, -step_size),
-            '6': (25, step_size), 'y': (25, -step_size),
-            '7': (26, step_size), 'u': (26, -step_size),
-            '8': (27, step_size), 'i': (27, -step_size),
-            '9': (30, step_size), 'o': (30, -step_size),
-            '0': (31, step_size), 'p': (31, -step_size),
-            'a': (32, step_size), 'z': (32, -step_size),
-            's': (33, step_size), 'x': (33, -step_size),
-            'd': (34, step_size), 'c': (34, -step_size),
-            'f': (35, step_size), 'v': (35, -step_size),
-            'g': (36, step_size), 'b': (36, -step_size),
-            'h': (37, step_size), 'n': (37, -step_size),
-            'j': (38, step_size), 'm': (38, -step_size),
+            '1': (20, controller.get_step_size(20)), 'q': (20, -controller.get_step_size(20)),
+            '2': (21, controller.get_step_size(21)), 'w': (21, -controller.get_step_size(21)),
+            '3': (22, controller.get_step_size(22)), 'e': (22, -controller.get_step_size(22)),
+            '4': (23, controller.get_step_size(23)), 'r': (23, -controller.get_step_size(23)),
+            '5': (24, controller.get_step_size(24)), 't': (24, -controller.get_step_size(24)),
+            '6': (25, controller.get_step_size(25)), 'y': (25, -controller.get_step_size(25)),
+            '7': (26, controller.get_step_size(26)), 'u': (26, -controller.get_step_size(26)),
+            '8': (27, controller.get_step_size(27)), 'i': (27, -controller.get_step_size(27)),
+            '9': (30, controller.get_step_size(30)), 'o': (30, -controller.get_step_size(30)),
+            '0': (31, controller.get_step_size(31)), 'p': (31, -controller.get_step_size(31)),
+            'a': (32, controller.get_step_size(32)), 'z': (32, -controller.get_step_size(32)),
+            's': (33, controller.get_step_size(33)), 'x': (33, -controller.get_step_size(33)),
+            'd': (34, controller.get_step_size(34)), 'c': (34, -controller.get_step_size(34)),
+            'f': (35, controller.get_step_size(35)), 'v': (35, -controller.get_step_size(35)),
+            'g': (36, controller.get_step_size(36)), 'b': (36, -controller.get_step_size(36)),
+            'h': (37, controller.get_step_size(37)), 'n': (37, -controller.get_step_size(37)),
+            'j': (38, controller.get_step_size(38)), 'm': (38, -controller.get_step_size(38)),
         }
 
         if key_char in key_mappings:

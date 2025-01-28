@@ -48,7 +48,7 @@ class MotorController:
     GOAL_POSITION_REG = 42
 
     # Class constants
-    MOVEMENT_INCREMENT = 50  # Adjust this value to control movement sensitivity
+    STEP_SIZE = 50  # Adjust this value to control movement sensitivity
 
     # Keyboard mapping for follower motors
     # Format: follower_id: {'up_key': key, 'down_key': key}
@@ -140,6 +140,21 @@ class MotorController:
         """Set the position for a list of servos."""
         for servo_id, position in positions.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
+
+    def get_step_size(self, servo_id: Optional[int]) -> int:
+        """
+        Get the step size for a servo, adjusted by its multiplier if applicable.
+
+        Args:
+            servo_id: ID of the servo, or None
+
+        Returns:
+            Adjusted step size. Returns default step size if servo_id is None.
+        """
+        if servo_id is None:
+            return self.STEP_SIZE
+        multiplier = self.MULTIPLIER_MAP.get(servo_id, self.DEFAULT_MULTIPLIER)
+        return int(self.STEP_SIZE * multiplier)
 
     # Teleoperation Functions
     def update_follower_position(
