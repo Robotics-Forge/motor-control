@@ -136,44 +136,10 @@ class MotorController:
             for servo_id in servo_ids
         }
 
-    # Used for keyboard control
-    def get_next_servo_positions(self, servo_ids: List[int], key: str) -> Dict[int, int]:
-        """
-        Calculate the next positions for the specified servo IDs based on keyboard input.
-
-        Args:
-            servo_ids: List of servo IDs to calculate positions for
-            key: The keyboard key that was pressed
-
-        Returns:
-            Dictionary mapping servo IDs to their next positions
-        """
-
-        current_positions = {
-            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or 2048
-            for servo_id in servo_ids
-        }
-
-        # If no key is pressed, return current positions
-        if not key:
-            return current_positions
-
-        # Find which follower (if any) this key controls
-        for follower_id, mapping in self.KEYBOARD_MAPPING.items():
-            if key.lower() == mapping['up_key']:
-                if follower_id in servo_ids:
-                    current_positions[follower_id] = min(
-                        4095,
-                        current_positions[follower_id] + self.MOVEMENT_INCREMENT
-                    )
-            elif key.lower() == mapping['down_key']:
-                if follower_id in servo_ids:
-                    current_positions[follower_id] = max(
-                        0,
-                        current_positions[follower_id] - self.MOVEMENT_INCREMENT
-                    )
-
-        return current_positions
+    def set_servo_positions(self, servo_ids: List[int], positions: Dict[int, int]) -> None:
+        """Set the position for a list of servos."""
+        for servo_id, position in positions.items():
+            self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
     # Teleoperation Functions
     def update_follower_position(

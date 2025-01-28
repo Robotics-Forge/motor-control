@@ -119,9 +119,9 @@ def handle_keyboard(controller):
 
         if key_char in key_mappings:
             servo_id, change = key_mappings[key_char]
-            current_pos = controller.get_servo_position(servo_id)
+            current_pos = controller.get_servo_positions([servo_id])
             new_pos = current_pos + change
-            controller.set_servo_position(servo_id, new_pos)
+            controller.set_servo_positions([servo_id], {servo_id: new_pos})
 
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
