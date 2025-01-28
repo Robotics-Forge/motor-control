@@ -1,23 +1,10 @@
 import socket
 import serial.tools.list_ports
-from motor_util import initialize_servos, SERVO_PAIRS
-from feetech_tuna import FeetechTuna
+from motor_control import MotorController
 
 # Network configuration
 HOST = '192.168.1.171'
 PORT = 12345
-
-# Multiplier system
-MULTIPLIER_MAP = {
-    # Motors with 5x multiplier
-    24: 4, 25: 4, 26: 4, 27: 4,
-    34: 4, 35: 4, 36: 4, 37: 4,
-}
-
-DEFAULT_MULTIPLIER = 1  # Default multiplier for all other motors
-
-# Motors to reverse direction (ONLY 4 series and 7 series)
-REVERSED_MOTORS = {24, 34, 26, 36}
 
 def list_serial_ports():
     """List all available serial ports."""
@@ -50,21 +37,20 @@ def main():
     if not selected_port:
         return
 
-    tuna = FeetechTuna()
+    controller = MotorController()
     try:
-        # Open serial port
-        if not tuna.openSerialPort(port=selected_port, baudrate=1000000):
+        # Connect to serial port
+        if not controller.connect(port=selected_port):
             print(f"Failed to open serial port {selected_port}.")
             return
 
         # Initialize servos
-        initialize_servos(tuna)
+        controller.initialize_servos()
 
         print("\nRetrieving initial positions for slave servos...")
-        # Retrieve current positions of slave servos as their baseline
-        slave_baselines = {
-            follower_id: tuna.readReg(follower_id, 56) or 2048 for _, follower_id in SERVO_PAIRS
-        }
+
+        # Get current positions of slave servos as their baseline
+        slave_baselines = controller.get_servo_positions(controller.get_follower_ids())
         print(f"Initial Slave Baselines: {slave_baselines}")
 
         # Placeholder for master servo baselines
@@ -95,57 +81,31 @@ def main():
 
                     # Update slave servos based on deltas
                     for master_id, master_new_position in commands.items():
-                        # Find corresponding slave servo
-                        slave_id = next(
-                            (pair[1] for pair in SERVO_PAIRS if pair[0] == master_id), None
+                        success, details = controller.update_follower_position(
+                            leader_id=master_id,
+                            leader_position=master_new_position,
+                            leader_baseline=master_baselines[master_id],
+                            follower_baseline=slave_baselines[details['follower_id']] if 'follower_id' in details else None
                         )
-                        if slave_id is None:
-                            print(f"No slave servo mapped to Master {master_id}, skipping...")
-                            continue
 
-                        # Calculate delta for the master servo with wraparound handling
-                        range_max = 4096  # Max value for servo position
-                        half_range = range_max // 2
-
-                        # Raw delta
-                        master_delta = master_new_position - master_baselines[master_id]
-
-                        # Adjust for wraparound
-                        if master_delta > half_range:
-                            master_delta -= range_max
-                        elif master_delta < -half_range:
-                            master_delta += range_max
-
-                        # Reverse delta for specific motors (4 and 7 series only)
-                        if slave_id in REVERSED_MOTORS:
-                            master_delta *= -1
-
-                        # Apply multiplier
-                        multiplier = MULTIPLIER_MAP.get(slave_id, DEFAULT_MULTIPLIER)
-                        scaled_delta = master_delta * multiplier
-
-                        # Calculate new position for the slave servo
-                        slave_new_position = slave_baselines[slave_id] + scaled_delta
-                        slave_new_position = max(0, min(4095, slave_new_position))  # Clamp to valid range
-
-                        # Move the slave servo
-                        success = tuna.writeReg(slave_id, 42, int(slave_new_position))
                         if success:
                             print(
-                                f"Master {master_id} moved to {master_new_position} (Delta: {master_delta}, Scaled Delta: {scaled_delta}). "
-                                f"Slave {slave_id} set to {slave_new_position}."
+                                f"Master {master_id} moved to {master_new_position}. "
+                                f"Slave {details['follower_id']} set to {details['new_position']} "
+                                f"(Delta: {details['delta']}, Scaled Delta: {details['scaled_delta']})."
                             )
                         else:
-                            print(f"Failed to move Slave {slave_id} to {slave_new_position}.")
-
-                        # Update Hand Position
+                            if 'error' in details:
+                                print(details['error'])
+                            else:
+                                print(f"Failed to move Slave {details.get('follower_id')}.")
 
                 except Exception as e:
                     print(f"Error processing commands: {e}")
     except KeyboardInterrupt:
         print("\nStopping receiver...")
     finally:
-        tuna.closeSerialPort()
+        controller.disconnect()
 
 if __name__ == "__main__":
     main()

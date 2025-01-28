@@ -1,5 +1,5 @@
 import serial.tools.list_ports
-from feetech_tuna import FeetechTuna
+from motor_control import MotorController
 
 def list_serial_ports():
     """List all available serial ports."""
@@ -12,23 +12,29 @@ def detect_servos(port, baudrate=1000000):
     Returns a list of detected servo IDs.
     """
     detected_servos = []
-    tuna = FeetechTuna()
+    controller = MotorController()
 
-    if not tuna.openSerialPort(port=port, baudrate=baudrate):
+    if not controller.connect(port=port, baudrate=baudrate):
         print(f"Failed to open port {port}")
         return detected_servos
 
     print(f"Scanning for servos on {port}...")
     try:
-        for servo_id in range(1, 51):  # Scan only up to servo ID 50
-            position = tuna.readReg(servo_id, 56)  # Read position register
+        # Get all possible servo IDs from the motor controller
+        servo_ids = controller.get_ids()
+
+        # Get positions for all servos at once
+        positions = controller.get_positions(servo_ids)
+
+        # Check which servos returned valid positions
+        for servo_id, position in zip(servo_ids, positions):
             if position is not None:
                 detected_servos.append(servo_id)
                 print(f"Detected servo ID: {servo_id}, Position: {position}")
     except Exception as e:
         print(f"Error scanning port {port}: {e}")
     finally:
-        tuna.closeSerialPort()
+        controller.disconnect()
 
     return detected_servos
 

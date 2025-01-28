@@ -2,11 +2,11 @@ import serial.tools.list_ports
 import time
 import sys
 import os
+import socket
+from motor_control import MotorController
+
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'feetech-tuna'))
 sys.path.append(path)
-from motor_util import initialize_servos, get_servo_positions
-from feetech_tuna import FeetechTuna
-import socket
 
 # Network configuration
 RECEIVER_IP = "192.168.1.171"
@@ -29,27 +29,27 @@ def main():
     port_index = int(input("Select the COM port (number): ")) - 1
     selected_port = available_ports[port_index]
 
-    tuna = FeetechTuna()
+    controller = MotorController(port=selected_port, baudrate=1000000)
 
     try:
-        if not tuna.openSerialPort(port=selected_port, baudrate=1000000):
+        if not controller.connect():
             print(f"Failed to open port {selected_port}")
             return
 
-        initialize_servos(tuna)
+        controller.initialize_motors()  # Replace initialize_servos with motor initialization
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((RECEIVER_IP, RECEIVER_PORT))
             print(f"Connected to receiver at {RECEIVER_IP}:{RECEIVER_PORT}")
 
             while True:
-                positions = get_servo_positions(tuna)
+                positions = controller.get_servo_positions(controller.get_follower_ids())
                 client_socket.sendall(str(positions).encode('utf-8'))
                 time.sleep(0.1)
     except KeyboardInterrupt:
         print("Stopping controller...")
     finally:
-        tuna.closeSerialPort()
+        controller.disconnect()  # Replace closeSerialPort with disconnect
 
 if __name__ == "__main__":
     main()
