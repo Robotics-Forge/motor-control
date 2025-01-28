@@ -1,50 +1,75 @@
 import os
 import sys
 import time
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Optional
+from feetech_tuna import FeetechTuna
 
 # Add the feetech-tuna directory to the path
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'feetech-tuna'))
 sys.path.append(path)
-from feetech_tuna import FeetechTuna
-
-# Constants
-SERVO_PAIRS: List[Tuple[int, int]] =
-[
-    (40, 20),
-    (1, 21),
-    (2, 22),
-    (3, 23),
-    (4, 24),
-    (5, 25),
-    (6, 26),
-    (7, 27),
-    (10, 30),
-    (11, 31),
-    (12, 32),
-    (13, 33),
-    (14, 34),
-    (15, 35),
-    (16, 36),
-    (17, 37),
-    (18, 38)
-]
-
-REVERSED_MOTORS: Set[int] = {26, 36, 27, 37}
-
-MULTIPLIER_MAP: Dict[int, float] = {
-    24: 4, 25: 4, 26: 4, 27: 4,
-    34: 4, 35: 4, 36: 4, 37: 4,
-}
-DEFAULT_MULTIPLIER: float = 1.0
-
-# Register addresses
-TORQUE_ENABLE_REG = 40
-MODE_REG = 33
-POSITION_REG = 56
-GOAL_POSITION_REG = 42
 
 class MotorController:
+
+    # Constants
+    SERVO_PAIRS: List[Tuple[int, int]] =
+    [
+        (40, 20),
+        (1, 21),
+        (2, 22),
+        (3, 23),
+        (4, 24),
+        (5, 25),
+        (6, 26),
+        (7, 27),
+        (10, 30),
+        (11, 31),
+        (12, 32),
+        (13, 33),
+        (14, 34),
+        (15, 35),
+        (16, 36),
+        (17, 37),
+        (18, 38)
+    ]
+
+    REVERSED_MOTORS: Set[int] = {26, 36, 27, 37}
+
+    MULTIPLIER_MAP: Dict[int, float] = {
+        24: 4, 25: 4, 26: 4, 27: 4,
+        34: 4, 35: 4, 36: 4, 37: 4,
+    }
+    DEFAULT_MULTIPLIER: float = 1.0
+
+    # Register addresses
+    TORQUE_ENABLE_REG = 40
+    MODE_REG = 33
+    POSITION_REG = 56
+    GOAL_POSITION_REG = 42
+
+    # Class constants
+    MOVEMENT_INCREMENT = 50  # Adjust this value to control movement sensitivity
+
+    # Keyboard mapping for follower motors
+    # Format: follower_id: {'up_key': key, 'down_key': key}
+    KEYBOARD_MAPPING = {
+        20: {'up_key': '1', 'down_key': 'q'},  # First pair
+        21: {'up_key': '2', 'down_key': 'w'},  # Second pair
+        22: {'up_key': '3', 'down_key': 'e'},  # Third pair
+        23: {'up_key': '4', 'down_key': 'r'},  # Fourth pair
+        24: {'up_key': '5', 'down_key': 't'},  # Fifth pair
+        25: {'up_key': '6', 'down_key': 'y'},  # Sixth pair
+        26: {'up_key': '7', 'down_key': 'u'},  # Seventh pair
+        27: {'up_key': '8', 'down_key': 'i'},  # Eighth pair
+        30: {'up_key': '9', 'down_key': 'o'},  # Ninth pair
+        31: {'up_key': '0', 'down_key': 'p'},  # Tenth pair
+        32: {'up_key': 'a', 'down_key': 'z'},  # Eleventh pair
+        33: {'up_key': 's', 'down_key': 'x'},  # Twelfth pair
+        34: {'up_key': 'd', 'down_key': 'c'},  # Thirteenth pair
+        35: {'up_key': 'f', 'down_key': 'v'},  # Fourteenth pair
+        36: {'up_key': 'g', 'down_key': 'b'},  # Fifteenth pair
+        37: {'up_key': 'h', 'down_key': 'n'},  # Sixteenth pair
+        38: {'up_key': 'j', 'down_key': 'm'},  # Seventeenth pair
+    }
 
     # Initialization Functions
     def __init__(self):
@@ -65,18 +90,18 @@ class MotorController:
     def initialize_servos(self) -> None:
         """Initialize all leader and follower servos in multi-turn mode."""
         print("Initializing all servos in multi-turn mode...")
-        for leader_id, follower_id in SERVO_PAIRS:
+        for leader_id, follower_id in self.SERVO_PAIRS:
             try:
                 # Disable torque
-                self.tuna.writeReg(follower_id, TORQUE_ENABLE_REG, 0)
-                self.tuna.writeReg(leader_id, TORQUE_ENABLE_REG, 0)
+                self.tuna.writeReg(follower_id, self.TORQUE_ENABLE_REG, 0)
+                self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 0)
 
                 # Set multi-turn mode
-                self.tuna.writeReg(follower_id, MODE_REG, 0)
-                self.tuna.writeReg(leader_id, MODE_REG, 0)
+                self.tuna.writeReg(follower_id, self.MODE_REG, 0)
+                self.tuna.writeReg(leader_id, self.MODE_REG, 0)
 
                 # Enable torque for followers only
-                self.tuna.writeReg(follower_id, TORQUE_ENABLE_REG, 1)
+                self.tuna.writeReg(follower_id, self.TORQUE_ENABLE_REG, 1)
                 print(f"Initialized Leader {leader_id} (torque off), Follower {follower_id} (torque on)")
             except Exception as e:
                 print(f"Critical: Failed to initialize pair {leader_id}-{follower_id}: {e}")
@@ -84,32 +109,72 @@ class MotorController:
     # ID Functions
     def get_ids(self) -> List[int]:
         """Get all IDs of the servos."""
-        return [leader_id for leader_id, _ in SERVO_PAIRS] + [follower_id for _, follower_id in SERVO_PAIRS]
+        return [leader_id for leader_id, _ in self.SERVO_PAIRS] + [follower_id for _, follower_id in self.SERVO_PAIRS]
 
     def get_leader_ids(self) -> List[int]:
         """Get all leader IDs."""
-        return [leader_id for leader_id, _ in SERVO_PAIRS]
+        return [leader_id for leader_id, _ in self.SERVO_PAIRS]
 
     def get_follower_ids(self) -> List[int]:
         """Get all follower IDs."""
-        return [follower_id for _, follower_id in SERVO_PAIRS]
+        return [follower_id for _, follower_id in self.SERVO_PAIRS]
 
     def get_leader_id(self, follower_id: int) -> int:
         """Get the leader ID for a given follower ID."""
-        return next((pair[0] for pair in SERVO_PAIRS if pair[1] == follower_id), None)
+        return next((pair[0] for pair in self.SERVO_PAIRS if pair[1] == follower_id), None)
 
     def get_follower_id(self, leader_id: int) -> int:
         """Get the follower ID for a given leader ID."""
-        return next((pair[1] for pair in SERVO_PAIRS if pair[0] == leader_id), None)
+        return next((pair[1] for pair in self.SERVO_PAIRS if pair[0] == leader_id), None)
 
     # Position Functions
     def get_servo_positions(self, servo_ids: List[int]) -> Dict[int, int]:
         """Get current positions for the specified servo IDs."""
         return {
-            servo_id: self.tuna.readReg(servo_id, POSITION_REG) or 2048
+            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or 2048
             for servo_id in servo_ids
         }
 
+    # Used for keyboard control
+    def get_next_servo_positions(self, servo_ids: List[int], key: str) -> Dict[int, int]:
+        """
+        Calculate the next positions for the specified servo IDs based on keyboard input.
+
+        Args:
+            servo_ids: List of servo IDs to calculate positions for
+            key: The keyboard key that was pressed
+
+        Returns:
+            Dictionary mapping servo IDs to their next positions
+        """
+
+        current_positions = {
+            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or 2048
+            for servo_id in servo_ids
+        }
+
+        # If no key is pressed, return current positions
+        if not key:
+            return current_positions
+
+        # Find which follower (if any) this key controls
+        for follower_id, mapping in self.KEYBOARD_MAPPING.items():
+            if key.lower() == mapping['up_key']:
+                if follower_id in servo_ids:
+                    current_positions[follower_id] = min(
+                        4095,
+                        current_positions[follower_id] + self.MOVEMENT_INCREMENT
+                    )
+            elif key.lower() == mapping['down_key']:
+                if follower_id in servo_ids:
+                    current_positions[follower_id] = max(
+                        0,
+                        current_positions[follower_id] - self.MOVEMENT_INCREMENT
+                    )
+
+        return current_positions
+
+    # Teleoperation Functions
     def update_follower_position(
         self,
         leader_id: int,
@@ -130,7 +195,7 @@ class MotorController:
             Tuple of (success, details_dict)
         """
         follower_id = next(
-            (pair[1] for pair in SERVO_PAIRS if pair[0] == leader_id), None
+            (pair[1] for pair in self.SERVO_PAIRS if pair[0] == leader_id), None
         )
         if follower_id is None:
             return False, {"error": f"No follower servo mapped to Leader {leader_id}"}
@@ -147,17 +212,17 @@ class MotorController:
             delta += range_max
 
         # Apply direction and scaling
-        if follower_id in REVERSED_MOTORS:
+        if follower_id in self.REVERSED_MOTORS:
             delta *= -1
 
-        multiplier = MULTIPLIER_MAP.get(follower_id, DEFAULT_MULTIPLIER)
+        multiplier = self.MULTIPLIER_MAP.get(follower_id, self.DEFAULT_MULTIPLIER)
         scaled_delta = delta * multiplier
 
         # Calculate and clamp new position
         new_position = max(0, min(4095, follower_baseline + scaled_delta))
 
         # Move the follower servo
-        success = self.tuna.writeReg(follower_id, GOAL_POSITION_REG, int(new_position))
+        success = self.tuna.writeReg(follower_id, self.GOAL_POSITION_REG, int(new_position))
 
         return success, {
             'follower_id': follower_id,
@@ -165,3 +230,20 @@ class MotorController:
             'delta': delta,
             'scaled_delta': scaled_delta
         }
+
+    # Keyboard Functions
+    def get_follower_for_key(self, key: str) -> Optional[int]:
+        """
+        Get the follower ID associated with a keyboard key.
+
+        Args:
+            key: The pressed keyboard key
+
+        Returns:
+            Follower ID if the key is mapped, None otherwise
+        """
+        key = key.lower()
+        for follower_id, mapping in self.KEYBOARD_MAPPING.items():
+            if key in [mapping['up_key'], mapping['down_key']]:
+                return follower_id
+        return None
