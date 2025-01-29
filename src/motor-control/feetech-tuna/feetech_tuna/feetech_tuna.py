@@ -143,6 +143,7 @@ class FeetechTuna:
                 value = self.packetHandler.scs_tohost(self.packetHandler.scs_makeword(value[0], value[1]), 15)
             else:
                 value = value[0]
+            print("Testing print here")
             # print(reg["name"] + " = " + str(value))
             return value
         else:
