@@ -39,7 +39,7 @@ class MotorController:
     # Create reverse mapping for easy lookup in both directions
     REVERSE_SERVO_MAP = {v: k for k, v in SERVO_MAP.items()}
 
-    REVERSED_MOTORS: Set[int] = {24, 34, 26, 36, 27, 37, 20, 30}
+    REVERSED_MOTORS: Set[int] = {24, 34, 26, 36, 27, 37, 30}
 
     MULTIPLIER_MAP: Dict[int, float] = {
         24: 4, 25: 4, 26: 4, 27: 4,
