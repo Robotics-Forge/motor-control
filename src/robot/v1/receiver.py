@@ -77,40 +77,43 @@ def main():
                     break
 
                 try:
-                    # Parse received master positions
+                    # Parse received follower positions
                     commands = eval(data)  # Replace with `json.loads` if using JSON
-                    print(f"Received master positions: {commands}")
+                    print(f"Received follower positions: {commands}")
 
                     # Initialize master baselines on the first command received
                     if master_baselines is None:
-                        master_baselines = commands.copy()
+                        # Convert follower IDs to leader IDs for baseline mapping
+                        master_baselines = {
+                            controller.get_leader_id(follower_id): position
+                            for follower_id, position in commands.items()
+                        }
                         print(f"Master baselines initialized: {master_baselines}")
 
                     # Update follower servos based on deltas
-                    for leader_id, leader_new_position in commands.items():
-                        follower_id = controller.get_follower_id(leader_id)
-                        if follower_id is None:
-                            print(f"No follower servo mapped to Leader {leader_id}")
+                    for follower_id, follower_new_position in commands.items():
+                        leader_id = controller.get_leader_id(follower_id)
+                        if leader_id is None:
+                            print(f"No leader servo mapped to Follower {follower_id}")
                             continue
 
                         success, details = controller.update_follower_position(
                             follower_id=follower_id,
-                            follower_position=leader_new_position,
+                            follower_position=follower_new_position,
                             follower_baseline=slave_baselines[follower_id],
                             leader_baseline=master_baselines[leader_id]
                         )
 
                         if success and details:  # Check that details exists
                             print(
-                                f"Leader {leader_id} moved to {leader_new_position}. "
-                                f"Follower {details['follower_id']} set to {details['new_position']} "
+                                f"Follower {follower_id} moved to {follower_new_position}. "
                                 f"(Delta: {details['delta']}, Scaled Delta: {details['scaled_delta']})."
                             )
                         else:
                             if details and 'error' in details:  # Check that details exists
                                 print(details['error'])
                             else:
-                                print(f"Failed to move Follower (Leader ID: {leader_id})")
+                                print(f"Failed to move Follower {follower_id}")
 
                 except Exception as e:
                     print(f"Error processing commands: {e}")
