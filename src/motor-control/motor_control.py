@@ -217,12 +217,20 @@ class MotorController:
         # Calculate and clamp new follower position
         new_position = max(0, min(4095, follower_baseline + scaled_delta))
 
+        # Record the current position as the new baseline
+        previous_position = self.tuna.readReg(follower_id, self.POSITION_REG)
+
         # Move the follower servo
         success = self.tuna.writeReg(follower_id, self.GOAL_POSITION_REG, int(new_position))
 
         return success, {
             'follower_id': follower_id,
+            'leader_id': leader_id,
+            'follower_baseline': follower_baseline,
+            'leader_baseline': leader_baseline,
+            'previous_position': previous_position,
             'new_position': new_position,
+            'position_delta': new_position - previous_position,
             'leader_delta': leader_delta,
             'scaled_delta': scaled_delta
         }

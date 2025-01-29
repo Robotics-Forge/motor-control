@@ -76,7 +76,7 @@ def process_command(controller, command, leader_baselines, follower_baselines):
         )
 
         # Only print if there's a non-zero delta
-        if 'scaled_delta' in details and details['scaled_delta'] != 0:
+        if 'position_delta' in details and abs(details['position_delta']) > 10:
             current_time = time.strftime("%H:%M:%S")
             print(f"[{current_time}] Follower {follower_id} updated: {success} - {details}")
 
