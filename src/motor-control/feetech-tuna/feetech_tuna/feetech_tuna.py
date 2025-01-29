@@ -172,10 +172,10 @@ class FeetechTuna:
                 # print(f"Register {regAddr} written")
                 return True
             else:
-                #print("Failed to write register - retrying...")
+                # print("Failed to write register - retrying...")
                 retries -= 1
 
-        #print("Failed to write register - giving up")
+        # print("Failed to write register - giving up")
         return False
 
     def unlockEEPROM(self, servoId):
