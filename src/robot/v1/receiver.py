@@ -78,24 +78,24 @@ def main():
                         current_time = time.strftime("%H:%M:%S")
                         print(f"[{current_time}] Received commands: {commands}")
 
-                    # Initialize master baselines on the first command received
-                    if master_baselines is None:
-                        master_baselines = {
-                            controller.get_leader_id(follower_id): position
-                            for follower_id, position in commands.items()
+                    # Initialize leader baselines on the first command received
+                    if leader_baselines is None:
+                        leader_baselines = {
+                            leader_id: position
+                            for leader_id, position in commands.items()
                         }
 
                     # Update follower servos based on deltas
-                    for follower_id, follower_new_position in commands.items():
-                        leader_id = controller.get_leader_id(follower_id)
+                    for leader_id, leader_new_position in commands.items():
                         if leader_id is None:
                             continue
 
+                        follower_id = controller.get_follower_id(leader_id)
                         controller.update_follower_position(
                             follower_id=follower_id,
                             follower_position=follower_new_position,
                             follower_baseline=slave_baselines[follower_id],
-                            leader_baseline=master_baselines[leader_id]
+                            leader_baseline=leader_baselines[leader_id]
                         )
 
                 except Exception as e:
