@@ -36,8 +36,8 @@ class MotorController:
     REVERSED_MOTORS: Set[int] = {26, 36, 27, 37}
 
     MULTIPLIER_MAP: Dict[int, float] = {
-        24: 4, 25: 4, 26: 4, 27: 4,
-        34: 4, 35: 4, 36: 4, 37: 4,
+        24: 3, 25: 3, 26: 3, 27: 3,
+        34: 3, 35: 3, 36: 3, 37: 3,
     }
     DEFAULT_MULTIPLIER: float = 1.0
 
