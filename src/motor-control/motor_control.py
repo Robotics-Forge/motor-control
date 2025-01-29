@@ -13,9 +13,6 @@ sys.path.append(feetech_tuna_root)
 # Now import your module
 from feetech_tuna import FeetechTuna
 
-# Import after adding to path
-from feetech_tuna import FeetechTuna
-
 class MotorController:
 
     # Constants
