@@ -128,7 +128,6 @@ class FeetechTuna:
         return result
 
     def readReg(self, servoId, regAddr):
-        print(f"Reading register {regAddr} for servo {servoId}")
         reg = None
         for r in servoRegs:
             if r["addr"] == regAddr:
