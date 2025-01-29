@@ -3,8 +3,18 @@ import sys
 import time
 from typing import Dict, List, Set, Tuple, Optional
 
+# Get the absolute path of the project root dynamically
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Get directory of this script
+feetech_tuna_root = os.path.abspath(os.path.join(current_dir, "./feetech-tuna/feetech_tuna"))  # Adjust this as needed
+
+# Add project root to sys.path
+sys.path.append(feetech_tuna_root)
+
+# Now import your module
+from feetech_tuna import FeetechTuna
+
 # Import after adding to path
-from feetech_tuna.feetech_tuna import FeetechTuna
+from feetech_tuna import FeetechTuna
 
 class MotorController:
 
