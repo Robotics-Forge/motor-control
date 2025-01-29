@@ -117,7 +117,7 @@ def main():
 
                     # Process each complete message
                     for command in messages:
-                        if time.time() % 1 < 0.1:  # Print approximately every second
+                        if time.time() % 3 < 0.1:
                             current_time = time.strftime("%H:%M:%S")
                             print(f"[{current_time}] Received command: {command}")
 
