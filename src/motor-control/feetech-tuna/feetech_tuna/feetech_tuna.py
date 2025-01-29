@@ -73,19 +73,19 @@ class FeetechTuna:
         else:
             print("Unknown servo family: " + servoFamily)
             return False
-        
+
         if (self.porthandler.openPort()):
             print("Opened port. Configuring baudrate...")
         else:
             print("Failed to open the port")
             return False
-        
+
         if (self.porthandler.setBaudRate(baudrate)):
             print("Baudrate set to " + str(baudrate))
         else:
             print("Failed to set baudrate")
             return False
-        
+
         print("Serial port opened successfully")
 
         return True
@@ -105,10 +105,10 @@ class FeetechTuna:
                 print('+', end='', flush=True)
             else:
                 print('.', end='', flush=True)
-            
+
         print()
         return result
-    
+
     def listRegs(self, servoId):
         result = []
         for reg in servoRegs:
@@ -126,7 +126,7 @@ class FeetechTuna:
             except:
                 print("Warning: Error occurred when reading register " + reg["name"] + " (addr: " + str(reg["addr"]) + ")")
         return result
-    
+
     def readReg(self, servoId, regAddr):
         reg = None
         for r in servoRegs:
@@ -136,19 +136,19 @@ class FeetechTuna:
         if reg == None:
             print("Unknown register: " + str(regAddr))
             return
-        
+
         value, comm_result, error = self.packetHandler.readTxRx(servoId, regAddr, reg["size"])
         if comm_result == COMM_SUCCESS:
             if (reg["size"] == 2):
                 value = self.packetHandler.scs_tohost(self.packetHandler.scs_makeword(value[0], value[1]), 15)
             else:
                 value = value[0]
-            print(reg["name"] + " = " + str(value))
+            # print(reg["name"] + " = " + str(value))
             return value
         else:
-            print("Failed to read register")
+            # print("Failed to read register")
             return None
-    
+
     def writeReg(self, servoId, regAddr, value):
         reg = None
         for r in servoRegs:
@@ -158,12 +158,12 @@ class FeetechTuna:
         if reg == None:
             print("Unknown register: " + str(regAddr))
             return
-        
+
         if reg["size"] == 2:
             value = [self.packetHandler.scs_lobyte(value), self.packetHandler.scs_hibyte(value)]
         else:
             value = [value]
-        
+
         retries = 3
 
         while retries > 0:
@@ -177,7 +177,7 @@ class FeetechTuna:
 
         print("Failed to write register - giving up")
         return False
-    
+
     def unlockEEPROM(self, servoId):
         self.packetHandler.unLockEprom(servoId)
         print("EEPROM unlocked")
@@ -185,5 +185,5 @@ class FeetechTuna:
     def lockEEPROM(self, servoId):
         self.packetHandler.LockEprom(servoId)
         print("EEPROM locked")
-            
+
 
