@@ -54,13 +54,8 @@ def main():
         # Initialize servos
         controller.initialize_servos()
 
-        print("\nRetrieving initial positions for slave servos...")
-
         # Get current positions of slave servos as their baseline
         slave_baselines = controller.get_servo_positions(controller.get_follower_ids())
-        print(f"Initial Slave Baselines: {slave_baselines}")
-
-        # Placeholder for master servo baselines
         master_baselines = None
 
         print(f"Receiver listening on {HOST}:{PORT}")
@@ -77,46 +72,30 @@ def main():
                     break
 
                 try:
-                    # Parse received follower positions
                     commands = eval(data)  # Replace with `json.loads` if using JSON
-                    print(f"Received follower positions: {commands}")
 
                     # Initialize master baselines on the first command received
                     if master_baselines is None:
-                        # Convert follower IDs to leader IDs for baseline mapping
                         master_baselines = {
                             controller.get_leader_id(follower_id): position
                             for follower_id, position in commands.items()
                         }
-                        print(f"Master baselines initialized: {master_baselines}")
 
                     # Update follower servos based on deltas
                     for follower_id, follower_new_position in commands.items():
                         leader_id = controller.get_leader_id(follower_id)
                         if leader_id is None:
-                            print(f"No leader servo mapped to Follower {follower_id}")
                             continue
 
-                        success, details = controller.update_follower_position(
+                        controller.update_follower_position(
                             follower_id=follower_id,
                             follower_position=follower_new_position,
                             follower_baseline=slave_baselines[follower_id],
                             leader_baseline=master_baselines[leader_id]
                         )
 
-                        if success and details:  # Check that details exists
-                            print(
-                                f"Follower {follower_id} moved to {follower_new_position}. "
-                                f"(Delta: {details['delta']}, Scaled Delta: {details['scaled_delta']})."
-                            )
-                        else:
-                            if details and 'error' in details:  # Check that details exists
-                                print(details['error'])
-                            else:
-                                print(f"Failed to move Follower {follower_id}")
-
                 except Exception as e:
-                    print(f"Error processing commands: {e}")
+                    print(f"Error: {e}")
     except KeyboardInterrupt:
         print("\nStopping receiver...")
     finally:

@@ -30,8 +30,7 @@ class MotorController:
         14: 34,
         15: 35,
         16: 36,
-        17: 37,
-        18: 38
+        17: 37
     }
 
     # Create reverse mapping for easy lookup in both directions
@@ -73,7 +72,12 @@ class MotorController:
         35: {'up_key': 'f', 'down_key': 'v'},  # Fourteenth pair
         36: {'up_key': 'g', 'down_key': 'b'},  # Fifteenth pair
         37: {'up_key': 'h', 'down_key': 'n'},  # Sixteenth pair
-        38: {'up_key': 'j', 'down_key': 'm'},  # Seventeenth pair
+    }
+
+    # Add this near the other class constants
+    STARTING_POSITIONS = {
+        30: 4095, 31: 2137, 32: 1817, 33: 1973, 34: 747, 35: 2194, 36: 3959, 37: 736,
+        20: 4095, 21: 2053, 22: 1941, 23: 2193, 24: 3846, 25: 232, 26: 621, 27: 3211
     }
 
     # Initialization Functions
@@ -94,7 +98,7 @@ class MotorController:
 
     def initialize_servos(self) -> None:
         """Initialize all leader and follower servos in multi-turn mode."""
-        print("Initializing all servos in multi-turn mode...")
+        print("Initializing servos in multi-turn mode...")
         for leader_id, follower_id in self.SERVO_MAP.items():
             try:
                 # Disable torque
@@ -107,9 +111,9 @@ class MotorController:
 
                 # Enable torque for followers only
                 self.tuna.writeReg(follower_id, self.TORQUE_ENABLE_REG, 1)
-                print(f"Initialized Leader {leader_id} (torque off), Follower {follower_id} (torque on)")
             except Exception as e:
-                print(f"Critical: Failed to initialize pair {leader_id}-{follower_id}: {e}")
+                print(f"Error initializing servos {leader_id}-{follower_id}: {e}")
+        print("Servo initialization complete")
 
     # ID Functions
     def get_ids(self) -> List[int]:
@@ -136,7 +140,7 @@ class MotorController:
     def get_servo_positions(self, servo_ids: List[int]) -> Dict[int, int]:
         """Get current positions for the specified servo IDs."""
         return {
-            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or 2048
+            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or self.STARTING_POSITIONS.get(servo_id, 2048)
             for servo_id in servo_ids
         }
 
@@ -180,8 +184,6 @@ class MotorController:
         Returns:
             Tuple of (success, details_dict)
         """
-        # Find the leader_id by looking up the follower_id in REVERSE_SERVO_MAP
-        print(f"Follower ID: {follower_id}, Follower Position: {follower_position}, Follower Baseline: {follower_baseline}, Leader Baseline: {leader_baseline}")
         leader_id = self.get_leader_id(follower_id)
         if leader_id is None:
             return False, {"error": f"No leader servo mapped to Follower {follower_id}"}

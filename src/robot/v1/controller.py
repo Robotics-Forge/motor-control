@@ -143,7 +143,7 @@ def handle_keyboard(controller):
         listener.join()
 
 def handle_teleoperation(controller, client_socket):
-    print("\nTeleoperation Mode")
+    print("Teleoperation Mode Active")
     while True:
         positions = controller.get_servo_positions(controller.get_follower_ids())
         client_socket.sendall(str(positions).encode('utf-8'))
