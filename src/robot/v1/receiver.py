@@ -95,17 +95,17 @@ def main():
                             follower_baseline=slave_baselines[details['follower_id']] if 'follower_id' in details else None
                         )
 
-                        if success:
+                        if success and details:  # Check that details exists
                             print(
                                 f"Master {master_id} moved to {master_new_position}. "
                                 f"Slave {details['follower_id']} set to {details['new_position']} "
                                 f"(Delta: {details['delta']}, Scaled Delta: {details['scaled_delta']})."
                             )
                         else:
-                            if 'error' in details:
+                            if details and 'error' in details:  # Check that details exists
                                 print(details['error'])
                             else:
-                                print(f"Failed to move Slave {details.get('follower_id')}.")
+                                print(f"Failed to move Slave (Master ID: {master_id})")
 
                 except Exception as e:
                     print(f"Error processing commands: {e}")
