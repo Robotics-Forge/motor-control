@@ -48,7 +48,7 @@ class MotorController:
     GOAL_POSITION_REG = 42
 
     # Class constants
-    STEP_SIZE = 50  # Adjust this value to control movement sensitivity
+    STEP_SIZE = 100  # Adjust this value to control movement sensitivity
 
     # Keyboard mapping for follower motors
     # Format: follower_id: {'up_key': key, 'down_key': key}
