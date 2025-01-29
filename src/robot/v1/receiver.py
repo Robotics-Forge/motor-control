@@ -86,27 +86,31 @@ def main():
                         master_baselines = commands.copy()
                         print(f"Master baselines initialized: {master_baselines}")
 
-                    # Update slave servos based on deltas
-                    for master_id, master_new_position in commands.items():
-                        details = {'follower_id': None}  # Initialize with default value
+                    # Update follower servos based on deltas
+                    for leader_id, leader_new_position in commands.items():
+                        follower_id = controller.get_follower_id(leader_id)
+                        if follower_id is None:
+                            print(f"No follower servo mapped to Leader {leader_id}")
+                            continue
+
                         success, details = controller.update_follower_position(
-                            leader_id=master_id,
-                            leader_position=master_new_position,
-                            leader_baseline=master_baselines[master_id],
-                            follower_baseline=slave_baselines[details['follower_id']] if details.get('follower_id') else None
+                            follower_id=follower_id,
+                            follower_position=leader_new_position,
+                            follower_baseline=slave_baselines[follower_id],
+                            leader_baseline=master_baselines[leader_id]
                         )
 
                         if success and details:  # Check that details exists
                             print(
-                                f"Master {master_id} moved to {master_new_position}. "
-                                f"Slave {details['follower_id']} set to {details['new_position']} "
+                                f"Leader {leader_id} moved to {leader_new_position}. "
+                                f"Follower {details['follower_id']} set to {details['new_position']} "
                                 f"(Delta: {details['delta']}, Scaled Delta: {details['scaled_delta']})."
                             )
                         else:
                             if details and 'error' in details:  # Check that details exists
                                 print(details['error'])
                             else:
-                                print(f"Failed to move Slave (Master ID: {master_id})")
+                                print(f"Failed to move Follower (Leader ID: {leader_id})")
 
                 except Exception as e:
                     print(f"Error processing commands: {e}")
