@@ -68,12 +68,16 @@ def process_command(controller, command, leader_baselines, follower_baselines):
             continue
 
         follower_id = controller.get_follower_id(leader_id)
-        controller.update_follower_position(
+        success, details = controller.update_follower_position(
             follower_id=follower_id,
             follower_baseline=follower_baselines[follower_id],
             leader_position=leader_new_position,
             leader_baseline=leader_baselines[leader_id]
         )
+
+        if time.time() % 3 < 0.1:
+            current_time = time.strftime("%H:%M:%S")
+            print(f"[{current_time}] Follower {follower_id} updated: {success} - {details}")
 
     return leader_baselines
 
