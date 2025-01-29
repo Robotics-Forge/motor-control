@@ -13,25 +13,29 @@ from feetech_tuna import FeetechTuna
 class MotorController:
 
     # Constants
-    SERVO_PAIRS: List[Tuple[int, int]] = [
-        (40, 20),
-        (1, 21),
-        (2, 22),
-        (3, 23),
-        (4, 24),
-        (5, 25),
-        (6, 26),
-        (7, 27),
-        (10, 30),
-        (11, 31),
-        (12, 32),
-        (13, 33),
-        (14, 34),
-        (15, 35),
-        (16, 36),
-        (17, 37),
-        (18, 38)
-    ]
+    SERVO_MAP = {
+        # Leader ID: Follower ID
+        40: 20,
+        1: 21,
+        2: 22,
+        3: 23,
+        4: 24,
+        5: 25,
+        6: 26,
+        7: 27,
+        10: 30,
+        11: 31,
+        12: 32,
+        13: 33,
+        14: 34,
+        15: 35,
+        16: 36,
+        17: 37,
+        18: 38
+    }
+
+    # Create reverse mapping for easy lookup in both directions
+    REVERSE_SERVO_MAP = {v: k for k, v in SERVO_MAP.items()}
 
     REVERSED_MOTORS: Set[int] = {26, 36, 27, 37}
 
@@ -91,7 +95,7 @@ class MotorController:
     def initialize_servos(self) -> None:
         """Initialize all leader and follower servos in multi-turn mode."""
         print("Initializing all servos in multi-turn mode...")
-        for leader_id, follower_id in self.SERVO_PAIRS:
+        for leader_id, follower_id in self.SERVO_MAP.items():
             try:
                 # Disable torque
                 self.tuna.writeReg(follower_id, self.TORQUE_ENABLE_REG, 0)
@@ -110,23 +114,23 @@ class MotorController:
     # ID Functions
     def get_ids(self) -> List[int]:
         """Get all IDs of the servos."""
-        return [leader_id for leader_id, _ in self.SERVO_PAIRS] + [follower_id for _, follower_id in self.SERVO_PAIRS]
+        return list(self.SERVO_MAP.keys()) + list(self.SERVO_MAP.values())
 
     def get_leader_ids(self) -> List[int]:
         """Get all leader IDs."""
-        return [leader_id for leader_id, _ in self.SERVO_PAIRS]
+        return list(self.SERVO_MAP.keys())
 
     def get_follower_ids(self) -> List[int]:
         """Get all follower IDs."""
-        return [follower_id for _, follower_id in self.SERVO_PAIRS]
+        return list(self.SERVO_MAP.values())
 
-    def get_leader_id(self, follower_id: int) -> int:
+    def get_leader_id(self, follower_id: int) -> Optional[int]:
         """Get the leader ID for a given follower ID."""
-        return next((pair[0] for pair in self.SERVO_PAIRS if pair[1] == follower_id), None)
+        return self.REVERSE_SERVO_MAP.get(follower_id)
 
-    def get_follower_id(self, leader_id: int) -> int:
+    def get_follower_id(self, leader_id: int) -> Optional[int]:
         """Get the follower ID for a given leader ID."""
-        return next((pair[1] for pair in self.SERVO_PAIRS if pair[0] == leader_id), None)
+        return self.SERVO_MAP.get(leader_id)
 
     # Position Functions
     def get_servo_positions(self, servo_ids: List[int]) -> Dict[int, int]:
@@ -176,7 +180,7 @@ class MotorController:
         Returns:
             Tuple of (success, details_dict)
         """
-        # Find the follower_id by looking up the leader_id in SERVO_PAIRS
+        # Find the follower_id by looking up the leader_id in SERVO_MAP
         follower_id = self.get_follower_id(leader_id)
         if follower_id is None:
             return False, {"error": f"No follower servo mapped to Leader {leader_id}"}
