@@ -81,11 +81,6 @@ def main():
                     commands = eval(data)  # Replace with `json.loads` if using JSON
                     print(f"Received master positions: {commands}")
 
-                    # Debug: Print the available mappings
-                    print("Available mappings:")
-                    print(f"SERVO_MAP: {controller.SERVO_MAP}")
-                    print(f"REVERSE_MAP: {controller.REVERSE_SERVO_MAP}")
-
                     # Initialize master baselines on the first command received
                     if master_baselines is None:
                         master_baselines = commands.copy()
@@ -93,12 +88,9 @@ def main():
 
                     # Update slave servos based on deltas
                     for master_id, master_new_position in commands.items():
-                        # Debug: Print the current master ID being processed
-                        print(f"Processing master_id: {master_id}")
-
-                        details = {'follower_id': None}
+                        details = {'follower_id': None}  # Initialize with default value
                         success, details = controller.update_follower_position(
-                            leader_id=int(master_id),  # Ensure it's an integer
+                            leader_id=master_id,
                             leader_position=master_new_position,
                             leader_baseline=master_baselines[master_id],
                             follower_baseline=slave_baselines[details['follower_id']] if details.get('follower_id') else None

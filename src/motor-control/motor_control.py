@@ -181,6 +181,7 @@ class MotorController:
             Tuple of (success, details_dict)
         """
         # Find the follower_id by looking up the leader_id in SERVO_MAP
+        print(f"Leader ID: {leader_id}, Leader Position: {leader_position}, Leader Baseline: {leader_baseline}, Follower Baseline: {follower_baseline}")
         follower_id = self.get_follower_id(leader_id)
         if follower_id is None:
             return False, {"error": f"No follower servo mapped to Leader {leader_id}"}
