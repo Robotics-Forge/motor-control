@@ -97,9 +97,11 @@ def main():
         # Initialize servos
         controller.initialize_servos()
 
+        # Set all servos to starting positions
         controller.set_servo_positions_to_starting_positions()
+        time.sleep(3)
 
-        # Get current positions of slave servos as their baseline
+        # Get current positions of follower servos as their baseline
         follower_baselines = controller.get_servo_positions(controller.get_follower_ids())
         leader_baselines = None
         buffer = ""
