@@ -41,6 +41,42 @@ def select_serial_port():
         except ValueError:
             print("Please enter a number.")
 
+def process_messages(buffer):
+    """Process complete messages from the buffer and return remaining buffer content."""
+    messages = []
+    while '\n' in buffer:
+        message, buffer = buffer.split('\n', 1)
+        try:
+            command = literal_eval(message)
+            messages.append(command)
+        except Exception as e:
+            print(f"Error parsing message: {e}")
+    return messages, buffer
+
+def process_command(controller, command, leader_baselines, follower_baselines):
+    """Process a single command message and update servo positions."""
+    # Initialize leader baselines on the first command received
+    if leader_baselines is None:
+        return {
+            leader_id: position
+            for leader_id, position in command.items()
+        }
+
+    # Update follower servos based on deltas
+    for leader_id, leader_new_position in command.items():
+        if leader_id is None:
+            continue
+
+        follower_id = controller.get_follower_id(leader_id)
+        controller.update_follower_position(
+            follower_id=follower_id,
+            follower_baseline=follower_baselines[follower_id],
+            leader_position=leader_new_position,
+            leader_baseline=leader_baselines[leader_id]
+        )
+
+    return leader_baselines
+
 def main():
     selected_port = select_serial_port()
     if not selected_port:
@@ -59,6 +95,7 @@ def main():
         # Get current positions of slave servos as their baseline
         follower_baselines = controller.get_servo_positions(controller.get_follower_ids())
         leader_baselines = None
+        buffer = ""
 
         print(f"Receiver listening on {HOST}:{PORT}")
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
@@ -74,33 +111,27 @@ def main():
                     break
 
                 try:
-                    commands = literal_eval(data)
-                    if time.time() % 1 < 0.1:  # Print approximately every 5 seconds
-                        current_time = time.strftime("%H:%M:%S")
-                        print(f"[{current_time}] Received commands: {commands}")
+                    # Add received data to buffer and process messages
+                    buffer += data
+                    messages, buffer = process_messages(buffer)
 
-                    # Initialize leader baselines on the first command received
-                    if leader_baselines is None:
-                        leader_baselines = {
-                            leader_id: position
-                            for leader_id, position in commands.items()
-                        }
+                    # Process each complete message
+                    for command in messages:
+                        if time.time() % 1 < 0.1:  # Print approximately every second
+                            current_time = time.strftime("%H:%M:%S")
+                            print(f"[{current_time}] Received command: {command}")
 
-                    # Update follower servos based on deltas
-                    for leader_id, leader_new_position in commands.items():
-                        if leader_id is None:
-                            continue
-
-                        follower_id = controller.get_follower_id(leader_id)
-                        controller.update_follower_position(
-                            follower_id=follower_id,
-                            follower_baseline=follower_baselines[follower_id],
-                            leader_position=leader_new_position,
-                            leader_baseline=leader_baselines[leader_id]
+                        leader_baselines = process_command(
+                            controller,
+                            command,
+                            leader_baselines,
+                            follower_baselines
                         )
 
                 except Exception as e:
-                    print(f"Error: {e}")
+                    print(f"Error in main loop: {e}")
+                    buffer = ""  # Clear buffer on error
+
     except KeyboardInterrupt:
         print("\nStopping receiver...")
     finally:

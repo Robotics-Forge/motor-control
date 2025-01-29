@@ -145,9 +145,23 @@ def handle_keyboard(controller):
 def handle_teleoperation(controller, client_socket):
     print("Teleoperation Mode Active")
     while True:
-        positions = controller.get_servo_positions(controller.get_leader_ids())
-        client_socket.sendall(str(positions).encode('utf-8'))
-        time.sleep(0.1)
+        try:
+            # Get current positions
+            positions = controller.get_servo_positions(controller.get_leader_ids())
+
+            # Send positions with a newline character as delimiter
+            message = str(positions) + '\n'
+            client_socket.sendall(message.encode('utf-8'))
+
+            # Add a small delay to prevent flooding
+            time.sleep(0.1)
+
+        except socket.error as e:
+            print(f"Socket error: {e}")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+            break
 
 if __name__ == "__main__":
     main()
