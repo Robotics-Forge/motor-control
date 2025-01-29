@@ -140,6 +140,8 @@ class MotorController:
     def get_servo_positions(self, servo_ids: List[int]) -> Dict[int, int]:
         print(f"Getting positions for servos: {servo_ids}")
         """Get current positions for the specified servo IDs."""
+
+        print(f"Reading positions for servos: {servo_ids}")
         return {
             servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or self.STARTING_POSITIONS.get(servo_id, 2048)
             for servo_id in servo_ids
