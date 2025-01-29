@@ -80,7 +80,7 @@ class MotorController:
     # Add this near the other class constants
     STARTING_POSITIONS = {
         30: 4095, 31: 1100, 32: 1817, 33: 1973, 34: 1200, 35: 2194, 36: 3359, 37: 736,
-        20: 4095, 21: 1600, 22: 1941, 23: 2193, 24: 2800, 25: 232, 26: 621, 27: 3211
+        20: 4095, 21: 1500, 22: 1941, 23: 2193, 24: 2800, 25: 232, 26: 621, 27: 3211
     }
 
     # Initialization Functions
