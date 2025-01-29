@@ -169,13 +169,13 @@ class FeetechTuna:
         while retries > 0:
             comm_result, error = self.packetHandler.writeTxRx(servoId, regAddr, reg["size"], value)
             if comm_result == COMM_SUCCESS:
-                print(f"Register {regAddr} written")
+                # print(f"Register {regAddr} written")
                 return True
             else:
-                print("Failed to write register - retrying...")
+                #print("Failed to write register - retrying...")
                 retries -= 1
 
-        print("Failed to write register - giving up")
+        #print("Failed to write register - giving up")
         return False
 
     def unlockEEPROM(self, servoId):
