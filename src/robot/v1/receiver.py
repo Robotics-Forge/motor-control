@@ -74,7 +74,8 @@ def main():
                 try:
                     commands = eval(data)  # Replace with `json.loads` if using JSON
                     if time.time() % 5 < 0.1:  # Print approximately every 5 seconds
-                        print(f"Received commands: {commands}")
+                        current_time = time.strftime("%H:%M:%S")
+                        print(f"[{current_time}] Received commands: {commands}")
 
                     # Initialize master baselines on the first command received
                     if master_baselines is None:
