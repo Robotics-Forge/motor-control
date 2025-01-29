@@ -163,33 +163,33 @@ class MotorController:
     # Teleoperation Functions
     def update_follower_position(
         self,
-        leader_id: int,
-        leader_position: int,
-        leader_baseline: int,
-        follower_baseline: int
+        follower_id: int,
+        follower_position: int,
+        follower_baseline: int,
+        leader_baseline: int
     ) -> Tuple[bool, Dict]:
         """
         Update a single follower based on leader movement.
 
         Args:
-            leader_id: ID of the leader servo
-            leader_position: Current position of the leader
-            leader_baseline: Baseline position of the leader
+            follower_id: ID of the follower servo
+            follower_position: Current position of the follower
             follower_baseline: Baseline position of the follower
+            leader_baseline: Baseline position of the leader
 
         Returns:
             Tuple of (success, details_dict)
         """
-        # Find the follower_id by looking up the leader_id in SERVO_MAP
-        print(f"Leader ID: {leader_id}, Leader Position: {leader_position}, Leader Baseline: {leader_baseline}, Follower Baseline: {follower_baseline}")
-        follower_id = self.get_follower_id(leader_id)
-        if follower_id is None:
-            return False, {"error": f"No follower servo mapped to Leader {leader_id}"}
+        # Find the leader_id by looking up the follower_id in REVERSE_SERVO_MAP
+        print(f"Follower ID: {follower_id}, Follower Position: {follower_position}, Follower Baseline: {follower_baseline}, Leader Baseline: {leader_baseline}")
+        leader_id = self.get_leader_id(follower_id)
+        if leader_id is None:
+            return False, {"error": f"No leader servo mapped to Follower {follower_id}"}
 
         # Calculate delta with wraparound handling
         range_max = 4096
         half_range = range_max // 2
-        delta = leader_position - leader_baseline
+        delta = follower_position - follower_baseline
 
         # Adjust for wraparound
         if delta > half_range:
@@ -205,7 +205,7 @@ class MotorController:
         scaled_delta = delta * multiplier
 
         # Calculate and clamp new position
-        new_position = max(0, min(4095, follower_baseline + scaled_delta))
+        new_position = max(0, min(4095, leader_baseline + scaled_delta))
 
         # Move the follower servo
         success = self.tuna.writeReg(follower_id, self.GOAL_POSITION_REG, int(new_position))
