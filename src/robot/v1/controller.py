@@ -13,7 +13,7 @@ sys.path.append(path)
 from motor_control import MotorController
 
 # Network configuration
-RECEIVER_IP = "192.168.1.171"
+RECEIVER_IP = "192.168.1.169"
 RECEIVER_PORT = 12345
 
 def list_serial_ports():
