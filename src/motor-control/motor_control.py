@@ -3,12 +3,8 @@ import sys
 import time
 from typing import Dict, List, Set, Tuple, Optional
 
-# Add the feetech-tuna directory to the path
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), '.', 'feetech-tuna'))
-sys.path.append(path)
-
 # Import after adding to path
-from .feetech_tuna import FeetechTuna
+from feetech_tuna.feetech_tuna import FeetechTuna
 
 class MotorController:
 
