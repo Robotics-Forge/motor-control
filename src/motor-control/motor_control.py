@@ -176,8 +176,8 @@ class MotorController:
     def update_follower_position(
         self,
         follower_id: int,
-        follower_position: int,
         follower_baseline: int,
+        leader_position: int,
         leader_baseline: int
     ) -> Tuple[bool, Dict]:
         """
@@ -185,8 +185,8 @@ class MotorController:
 
         Args:
             follower_id: ID of the follower servo
-            follower_position: Current position of the follower
             follower_baseline: Baseline position of the follower
+            leader_position: Current position of the leader
             leader_baseline: Baseline position of the leader
 
         Returns:
@@ -196,26 +196,26 @@ class MotorController:
         if leader_id is None:
             return False, {"error": f"No leader servo mapped to Follower {follower_id}"}
 
-        # Calculate delta with wraparound handling
+        # Calculate leader's delta with wraparound handling
         range_max = 4096
         half_range = range_max // 2
-        delta = follower_position - follower_baseline
+        leader_delta = leader_position - leader_baseline
 
         # Adjust for wraparound
-        if delta > half_range:
-            delta -= range_max
-        elif delta < -half_range:
-            delta += range_max
+        if leader_delta > half_range:
+            leader_delta -= range_max
+        elif leader_delta < -half_range:
+            leader_delta += range_max
 
         # Apply direction and scaling
         if follower_id in self.REVERSED_MOTORS:
-            delta *= -1
+            leader_delta *= -1
 
         multiplier = self.MULTIPLIER_MAP.get(follower_id, self.DEFAULT_MULTIPLIER)
-        scaled_delta = delta * multiplier
+        scaled_delta = leader_delta / multiplier  # Division because we're copying leader movement
 
-        # Calculate and clamp new position
-        new_position = max(0, min(4095, leader_baseline + scaled_delta))
+        # Calculate and clamp new follower position
+        new_position = max(0, min(4095, follower_baseline + scaled_delta))
 
         # Move the follower servo
         success = self.tuna.writeReg(follower_id, self.GOAL_POSITION_REG, int(new_position))
@@ -223,7 +223,7 @@ class MotorController:
         return success, {
             'follower_id': follower_id,
             'new_position': new_position,
-            'delta': delta,
+            'leader_delta': leader_delta,
             'scaled_delta': scaled_delta
         }
 

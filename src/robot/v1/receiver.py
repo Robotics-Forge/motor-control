@@ -56,7 +56,7 @@ def main():
         controller.initialize_servos()
 
         # Get current positions of slave servos as their baseline
-        slave_baselines = controller.get_servo_positions(controller.get_follower_ids())
+        follower_baselines = controller.get_servo_positions(controller.get_follower_ids())
         leader_baselines = None
 
         print(f"Receiver listening on {HOST}:{PORT}")
@@ -93,8 +93,8 @@ def main():
                         follower_id = controller.get_follower_id(leader_id)
                         controller.update_follower_position(
                             follower_id=follower_id,
-                            follower_position=follower_new_position,
-                            follower_baseline=slave_baselines[follower_id],
+                            follower_baseline=follower_baselines[follower_id],
+                            leader_position=leader_new_position,
                             leader_baseline=leader_baselines[leader_id]
                         )
 
