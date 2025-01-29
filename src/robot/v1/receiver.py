@@ -57,7 +57,7 @@ def main():
 
         # Get current positions of slave servos as their baseline
         slave_baselines = controller.get_servo_positions(controller.get_follower_ids())
-        master_baselines = None
+        leader_baselines = None
 
         print(f"Receiver listening on {HOST}:{PORT}")
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
