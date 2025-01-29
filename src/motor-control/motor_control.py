@@ -144,7 +144,6 @@ class MotorController:
 
     # Position Functions
     def get_servo_positions(self, servo_ids: List[int]) -> Dict[int, int]:
-        print(f"Getting positions for servos: {servo_ids}")
         """Get current positions for the specified servo IDs."""
         return {
             servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or self.STARTING_POSITIONS.get(servo_id, 2048)
@@ -154,6 +153,11 @@ class MotorController:
     def set_servo_positions(self, positions: Dict[int, int]) -> None:
         """Set the position for a list of servos."""
         for servo_id, position in positions.items():
+            self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
+
+    def set_servo_positions_to_starting_positions(self) -> None:
+        """Set the position for a list of servos."""
+        for servo_id, position in self.STARTING_POSITIONS.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
     def get_step_size(self, servo_id: Optional[int] = None) -> int:
