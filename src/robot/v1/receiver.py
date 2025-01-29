@@ -3,7 +3,7 @@ import serial.tools.list_ports
 import sys
 import os
 import time
-import json
+from ast import literal_eval
 
 # Add the motor-control directory to the path
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'motor-control'))
@@ -74,8 +74,8 @@ def main():
                     break
 
                 try:
-                    commands = json.loads(data)  # Replace eval() with json.loads()
-                    if time.time() % 5 < 0.1:  # Print approximately every 5 seconds
+                    commands = literal_eval(data)
+                    if time.time() % 1 < 0.1:  # Print approximately every 5 seconds
                         current_time = time.strftime("%H:%M:%S")
                         print(f"[{current_time}] Received commands: {commands}")
 
