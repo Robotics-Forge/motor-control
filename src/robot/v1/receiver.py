@@ -54,10 +54,6 @@ def main():
         # Initialize servos
         controller.initialize_servos()
 
-        # Set all servos to starting positions
-        controller.set_servo_positions_to_starting_positions()
-        return
-
         # Get current positions of slave servos as their baseline
         slave_baselines = controller.get_servo_positions(controller.get_follower_ids())
         master_baselines = None
