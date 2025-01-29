@@ -77,6 +77,7 @@ def main():
 
                 try:
                     commands = eval(data)  # Replace with `json.loads` if using JSON
+                    print(f"Received commands: {commands}")
 
                     # Initialize master baselines on the first command received
                     if master_baselines is None:
