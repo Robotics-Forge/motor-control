@@ -176,9 +176,8 @@ class MotorController:
         Returns:
             Tuple of (success, details_dict)
         """
-        follower_id = next(
-            (pair[1] for pair in self.SERVO_PAIRS if pair[0] == leader_id), None
-        )
+        # Find the follower_id by looking up the leader_id in SERVO_PAIRS
+        follower_id = self.get_follower_id(leader_id)
         if follower_id is None:
             return False, {"error": f"No follower servo mapped to Leader {leader_id}"}
 
