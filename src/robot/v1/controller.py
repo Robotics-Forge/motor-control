@@ -143,11 +143,9 @@ def handle_keyboard(controller):
         listener.join()
 
 def handle_teleoperation(controller, client_socket):
-    print("Teleoperation Mode Active")
-
+    print("Teleoperation Mode Active")    
     controller.set_leader_servo_positions_to_starting_positions()
-    time.sleep(3)
-
+    
     leader_baselines = controller.get_servo_positions(controller.get_leader_ids())
     print(f"Leader baselines: {leader_baselines}")
     while True:

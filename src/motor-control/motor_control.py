@@ -83,8 +83,8 @@ class MotorController:
     }
 
     LEADER_STARTING_POSITIONS = {
-        40: 4095, 1: 3600, 2: 1500, 3: 900, 4: 3600, 5: 2800, 6: 800, 7: 4095,
-        10: 0, 11: 3600, 12: 1500, 13: 3100, 14: 400, 15: 1200, 16: 800, 17: 0
+        40: 3913, 1: 3604, 2: 1147, 3: 695, 4: 3898, 5: 2779, 6: 1336, 7: 352, 
+        10: 10, 11: 3746, 12: 2125, 13: 1732, 14: 2538, 15: 1330, 16: 249, 17: 1068
     }
 
     # Initialization Functions
@@ -164,10 +164,16 @@ class MotorController:
 
     def set_leader_servo_positions_to_starting_positions(self) -> None:
         """Set the position for a list of servos."""              
+        for leader_id, follower_id in self.SERVO_MAP.items():
+            self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 1) # Enable Torque
+
         for servo_id, position in self.LEADER_STARTING_POSITIONS.items():
-            self.tuna.writeReg(servo_id, self.TORQUE_ENABLE_REG, 1) # Enable Torque
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
-            self.tuna.writeReg(servo_id, self.TORQUE_ENABLE_REG, 0) # Disable Torque
+
+        time.sleep(5) # Wait 5 seconds for the motors to move
+
+        for leader_id, follower_id in self.SERVO_MAP.items():
+            self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 0) # Disable Torque
 
     def get_step_size(self, servo_id: Optional[int] = None) -> int:
         """
