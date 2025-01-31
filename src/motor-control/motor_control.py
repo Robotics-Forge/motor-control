@@ -39,7 +39,7 @@ class MotorController:
     # Create reverse mapping for easy lookup in both directions
     REVERSE_SERVO_MAP = {v: k for k, v in SERVO_MAP.items()}
 
-    REVERSED_MOTORS: Set[int] = {24, 34, 26, 36, 27, 37, 30}
+    REVERSED_MOTORS: Set[int] = {24, 34, 26, 36, 30}
 
     MULTIPLIER_MAP: Dict[int, float] = {
         24: 4, 25: 4, 26: 4, 27: 4,
@@ -219,6 +219,9 @@ class MotorController:
 
         # Record the current position as the new baseline
         previous_position = self.tuna.readReg(follower_id, self.POSITION_REG)
+        position_delta = 0
+        if (previous_position != None and new_position != None):
+            position_delta = new_position - previous_position
 
         # Move the follower servo
         success = self.tuna.writeReg(follower_id, self.GOAL_POSITION_REG, int(new_position))
@@ -230,7 +233,7 @@ class MotorController:
             'leader_baseline': leader_baseline,
             'previous_position': previous_position,
             'new_position': new_position,
-            'position_delta': new_position - previous_position,
+            'position_delta': position_delta,
             'leader_delta': leader_delta,
             'scaled_delta': scaled_delta
         }
