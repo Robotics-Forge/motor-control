@@ -93,7 +93,7 @@ def main():
         controller.initialize_servos()
 
         # Set all servos to starting positions
-        controller.set_servo_positions_to_starting_positions()
+        controller.set_follower_servo_positions_to_starting_positions()
         time.sleep(3)
 
         # Get current positions of follower servos as their baseline
