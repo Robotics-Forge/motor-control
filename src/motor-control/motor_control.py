@@ -77,10 +77,14 @@ class MotorController:
         37: {'up_key': 'h', 'down_key': 'n'},  # Sixteenth pair
     }
 
-    # Add this near the other class constants
-    STARTING_POSITIONS = {
-        30: 4095, 31: 1100, 32: 1817, 33: 1973, 34: 400, 35: 2194, 36: 3359, 37: 736, # Right 
+    FOLLOWER_STARTING_POSITIONS = {
+        30: 4095, 31: 1100, 32: 1817, 33: 1973, 34: 400, 35: 2194, 36: 3359, 37: 736, # Right
         20: 4095, 21: 1500, 22: 1941, 23: 2193, 24: 3600, 25: 232, 26: 621, 27: 3211 # Left
+    }
+
+    LEADER_STARTING_POSITIONS = FOLLOWER_STARTING_POSITIONS = {
+        40: 4095, 1: 3600, 2: 1500, 3: 900, 4: 3600, 5: 2800, 6: 800, 7: 4095,
+        10: 0, 11: 3600, 12: 1500, 13: 3100, 14: 400, 15: 1200, 16: 800, 17: 0
     }
 
     # Initialization Functions
@@ -143,7 +147,7 @@ class MotorController:
     def get_servo_positions(self, servo_ids: List[int]) -> Dict[int, int]:
         """Get current positions for the specified servo IDs."""
         return {
-            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or self.STARTING_POSITIONS.get(servo_id, 2048)
+            servo_id: self.tuna.readReg(servo_id, self.POSITION_REG) or self.FOLLOWER_STARTING_POSITIONS.get(servo_id, 2048)
             for servo_id in servo_ids
         }
 
@@ -152,9 +156,14 @@ class MotorController:
         for servo_id, position in positions.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
-    def set_servo_positions_to_starting_positions(self) -> None:
+    def set_follower_servo_positions_to_starting_positions(self) -> None:
         """Set the position for a list of servos."""
-        for servo_id, position in self.STARTING_POSITIONS.items():
+        for servo_id, position in self.FOLLOWER_STARTING_POSITIONS.items():
+            self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
+
+    def set_leader_servo_positions_to_starting_positions(self) -> None:
+        """Set the position for a list of servos."""
+        for servo_id, position in self.LEADER_STARTING_POSITIONS.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
     def get_step_size(self, servo_id: Optional[int] = None) -> int:
