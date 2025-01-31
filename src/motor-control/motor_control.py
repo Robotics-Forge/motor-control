@@ -82,7 +82,7 @@ class MotorController:
         20: 4095, 21: 1500, 22: 1941, 23: 2193, 24: 3600, 25: 232, 26: 621, 27: 3211 # Left
     }
 
-    LEADER_STARTING_POSITIONS = FOLLOWER_STARTING_POSITIONS = {
+    LEADER_STARTING_POSITIONS = {
         40: 4095, 1: 3600, 2: 1500, 3: 900, 4: 3600, 5: 2800, 6: 800, 7: 4095,
         10: 0, 11: 3600, 12: 1500, 13: 3100, 14: 400, 15: 1200, 16: 800, 17: 0
     }
@@ -118,6 +118,7 @@ class MotorController:
 
                 # Enable torque for followers only
                 self.tuna.writeReg(follower_id, self.TORQUE_ENABLE_REG, 1)
+
             except Exception as e:
                 print(f"Error initializing servos {leader_id}-{follower_id}: {e}")
         print("Servo initialization complete")
@@ -162,9 +163,11 @@ class MotorController:
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
     def set_leader_servo_positions_to_starting_positions(self) -> None:
-        """Set the position for a list of servos."""
+        """Set the position for a list of servos."""              
         for servo_id, position in self.LEADER_STARTING_POSITIONS.items():
+            self.tuna.writeReg(servo_id, self.TORQUE_ENABLE_REG, 1) # Enable Torque
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
+            self.tuna.writeReg(servo_id, self.TORQUE_ENABLE_REG, 0) # Disable Torque
 
     def get_step_size(self, servo_id: Optional[int] = None) -> int:
         """
