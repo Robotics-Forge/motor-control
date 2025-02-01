@@ -137,7 +137,8 @@ def handle_keyboard(controller):
         # Check if it's time to update follower positions (every 3 seconds)
         current_time = time.time()
         if current_time - last_follower_update >= 3.0:
-            controller.update_follower_positions()
+            follower_servos = controller.get_servo_positions(controller.get_follower_ids())
+            print (f"Follower servos: {follower_servos}")
             last_follower_update = current_time
 
     def on_release(key):
