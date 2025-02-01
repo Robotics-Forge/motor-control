@@ -83,7 +83,7 @@ class MotorController:
     }
 
     LEADER_STARTING_POSITIONS = {
-        40: 3913, 1: 3611, 2: 1147, 3: 693, 4: 3499, 5: 2777, 6: 1308, 7: 3800, # Right
+        40: 3913, 1: 3611, 2: 1147, 3: 693, 4: 3499, 5: 2777, 6: 1308, 7: 4095, # Right
         10: 9, 11: 3740, 12: 2125, 13: 1731, 14: 2643, 15: 1326, 16: 190, 17: 1116 # Left
     }
 
@@ -163,7 +163,7 @@ class MotorController:
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
     def set_leader_servo_positions_to_starting_positions(self) -> None:
-        """Set the position for a list of servos."""              
+        """Set the position for a list of servos."""
         for leader_id, follower_id in self.SERVO_MAP.items():
             self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 1) # Enable Torque
 
