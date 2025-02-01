@@ -82,10 +82,7 @@ class MotorController:
         20: 4095, 21: 1500, 22: 1941, 23: 2193, 24: 3600, 25: 232, 26: 621, 27: 3211 # Left
     }
 
-    LEADER_STARTING_POSITIONS = {
-        40: 3913, 1: 3604, 2: 1147, 3: 695, 4: 3898, 5: 2779, 6: 1336, 7: 352, 
-        10: 10, 11: 3746, 12: 2125, 13: 1732, 14: 2538, 15: 1330, 16: 249, 17: 1068
-    }
+    LEADER_STARTING_POSITIONS = {40: 3913, 1: 3611, 2: 1147, 3: 693, 4: 3499, 5: 2777, 6: 1308, 7: 4095, 10: 9, 11: 3740, 12: 2125, 13: 1731, 14: 2643, 15: 1326, 16: 190, 17: 1116}
 
     # Initialization Functions
     def __init__(self):
@@ -172,8 +169,8 @@ class MotorController:
 
         time.sleep(5) # Wait 5 seconds for the motors to move
 
-        for leader_id, follower_id in self.SERVO_MAP.items():
-            self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 0) # Disable Torque
+        # for leader_id, follower_id in self.SERVO_MAP.items():
+        #     self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 0) # Disable Torque
 
     def get_step_size(self, servo_id: Optional[int] = None) -> int:
         """

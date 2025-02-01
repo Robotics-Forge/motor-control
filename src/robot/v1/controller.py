@@ -57,10 +57,10 @@ def main():
             return
         controller.initialize_servos()
 
-        if mode == 2:
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect((RECEIVER_IP, RECEIVER_PORT))
-            print(f"Connected to receiver at {RECEIVER_IP}:{RECEIVER_PORT}")
+        # if mode == 2:
+        #     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #     client_socket.connect((RECEIVER_IP, RECEIVER_PORT))
+        #     print(f"Connected to receiver at {RECEIVER_IP}:{RECEIVER_PORT}")
 
         if mode == 1:
             handle_keyboard(controller)
@@ -145,9 +145,13 @@ def handle_keyboard(controller):
 def handle_teleoperation(controller, client_socket):
     print("Teleoperation Mode Active")    
     controller.set_leader_servo_positions_to_starting_positions()
-    
+
     leader_baselines = controller.get_servo_positions(controller.get_leader_ids())
     print(f"Leader baselines: {leader_baselines}")
+    while True:
+        time.sleep(10)
+        print("sdfsd")
+
     while True:
         try:
             # Get current positions
