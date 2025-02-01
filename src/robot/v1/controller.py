@@ -90,8 +90,10 @@ def handle_keyboard(controller):
 
     # Set to keep track of currently pressed keys
     pressed_keys = set()
+    last_follower_update = time.time()  # Add timer for follower updates
 
     def on_press(key):
+        nonlocal last_follower_update  # Allow access to the timer variable
         try:
             key_char = key.char
             pressed_keys.add(key_char)
@@ -132,6 +134,12 @@ def handle_keyboard(controller):
         if position_updates:
             controller.set_servo_positions(position_updates)
 
+        # Check if it's time to update follower positions (every 3 seconds)
+        current_time = time.time()
+        if current_time - last_follower_update >= 3.0:
+            controller.update_follower_positions()
+            last_follower_update = current_time
+
     def on_release(key):
         try:
             key_char = key.char
@@ -143,7 +151,7 @@ def handle_keyboard(controller):
         listener.join()
 
 def handle_teleoperation(controller, client_socket):
-    print("Teleoperation Mode Active")    
+    print("Teleoperation Mode Active")
     controller.set_leader_servo_positions_to_starting_positions()
     time.sleep(3)
 
