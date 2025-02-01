@@ -57,10 +57,10 @@ def main():
             return
         controller.initialize_servos()
 
-        # if mode == 2:
-        #     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #     client_socket.connect((RECEIVER_IP, RECEIVER_PORT))
-        #     print(f"Connected to receiver at {RECEIVER_IP}:{RECEIVER_PORT}")
+        if mode == 2:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((RECEIVER_IP, RECEIVER_PORT))
+            print(f"Connected to receiver at {RECEIVER_IP}:{RECEIVER_PORT}")
 
         if mode == 1:
             handle_keyboard(controller)
