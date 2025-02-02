@@ -161,19 +161,28 @@ def handle_teleoperation(controller, client_socket):
     reset_button = Button(21)  # Changed to Button with default pull_up=True
     print("Reset button initialized on GPIO 21")
 
+    # Add last_reset variable to track reset timing
+    last_reset = 0
+
     def on_button_press():
+        nonlocal last_reset
         print("Reset command pressed")
         controller.set_leader_servo_positions_to_starting_positions()
         time.sleep(3)
 
         print("Reset command sent")
         client_socket.sendall("{'all': 'RESET'}\n".encode('utf-8'))
-        time.sleep(3)
+        last_reset = time.time()  # Store the time of reset
 
     reset_button.when_pressed = on_button_press
 
     while True:
         try:
+            # Check if we're within the 3-second pause period after reset
+            if time.time() - last_reset < 3.0:
+                time.sleep(0.1)
+                continue
+
             # Get current positions
             positions = controller.get_servo_positions(controller.get_leader_ids())
             message = str(positions) + '\n'
