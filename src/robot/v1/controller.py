@@ -4,7 +4,7 @@ import sys
 import os
 import socket
 from pynput import keyboard
-from gpiozero import DigitalInputDevice
+from gpiozero import Button
 
 # Add the motor-control directory to the path
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'motor-control'))
@@ -158,22 +158,18 @@ def handle_teleoperation(controller, client_socket):
     time.sleep(3)
 
     # Initialize reset button on GPIO 21
-    reset_button = DigitalInputDevice(21, pull_up=False)  # Changed to pull-down
-    print("Input initialized on GPIO 21")
+    reset_button = Button(21)  # Changed to Button with default pull_up=True
+    print("Reset button initialized on GPIO 21")
+
+    def on_button_press():
+        print("Reset command sent")
+        client_socket.sendall("RESET\n".encode('utf-8'))
+        controller.set_servo_positions_to_starting_positions()
+
+    reset_button.when_pressed = on_button_press
 
     while True:
         try:
-            # Check for button press
-            if reset_button.value == 1:  # Button is pressed (pulled high)
-                print("Button press detected!")
-                client_socket.sendall("RESET\n".encode('utf-8'))
-                controller.set_servo_positions_to_starting_positions()
-                print("Reset command sent")
-                time.sleep(0.5)  # Debounce delay
-
-            # Debug print to see the value
-            print(f"Button value: {reset_button.value}")
-
             # Get current positions
             positions = controller.get_servo_positions(controller.get_leader_ids())
             message = str(positions) + '\n'
