@@ -4,6 +4,8 @@ import sys
 import os
 import socket
 from pynput import keyboard
+from gpiozero import Button
+from signal import pause
 
 # Add the motor-control directory to the path
 path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'motor-control'))
@@ -155,6 +157,20 @@ def handle_teleoperation(controller, client_socket):
     print("Teleoperation Mode Active")
     controller.set_leader_servo_positions_to_starting_positions()
     time.sleep(3)
+
+    # Initialize reset button on GPIO 18
+    reset_button = Button(18)
+
+    def on_button_pressed():
+        try:
+            # Send RESET command
+            client_socket.sendall("RESET\n".encode('utf-8'))
+            print("Reset command sent")
+        except socket.error as e:
+            print(f"Failed to send reset command: {e}")
+
+    # Attach the button handler
+    reset_button.when_pressed = on_button_pressed
 
     while True:
         try:

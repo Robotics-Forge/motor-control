@@ -55,6 +55,11 @@ def process_messages(buffer):
 
 def process_command(controller, command, leader_baselines, follower_baselines):
     """Process a single command message and update servo positions."""
+    # Handle RESET command
+    if command == "RESET":
+        controller.set_follower_servo_positions_to_starting_positions()
+        return leader_baselines
+
     # Initialize leader baselines on the first command received
     if leader_baselines is None:
         return {
