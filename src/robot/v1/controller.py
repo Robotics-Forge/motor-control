@@ -176,8 +176,8 @@ def handle_teleoperation(controller, client_socket):
 
     while True:
         try:
-            # Check if we're within the 3-second pause period after reset
-            if time.time() - last_reset < 3.0:
+            # Check if we're within the 5-second pause period after reset
+            if time.time() - last_reset < 5.0:
                 time.sleep(0.1)
                 continue
 
