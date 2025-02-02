@@ -160,8 +160,10 @@ def handle_teleoperation(controller, client_socket):
 
     # Initialize reset button on GPIO 21
     reset_button = Button(21)
+    print("Button initialized on GPIO 21")  # Debug print
 
     def on_button_pressed():
+        print("Button press detected!")  # Debug print before sending
         try:
             # Send RESET command
             client_socket.sendall("RESET\n".encode('utf-8'))
@@ -171,18 +173,20 @@ def handle_teleoperation(controller, client_socket):
 
     # Attach the button handler
     reset_button.when_pressed = on_button_pressed
+    print("Button handler attached")  # Debug print
 
+    # Keep the program running and listening for button presses
     while True:
         try:
             # Get current positions
             positions = controller.get_servo_positions(controller.get_leader_ids())
-
-            # Send positions with a newline character as delimiter
             message = str(positions) + '\n'
             client_socket.sendall(message.encode('utf-8'))
-
-            # Add a small delay to prevent flooding
             time.sleep(0.1)
+
+            # Add debug print for button state
+            if reset_button.is_pressed:
+                print("Button is currently pressed (polling check)")
 
         except socket.error as e:
             print(f"Socket error: {e}")
