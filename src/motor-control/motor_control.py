@@ -157,11 +157,6 @@ class MotorController:
         for servo_id, position in positions.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
-    def set_servo_positions_to_starting_positions(self) -> None:
-        """Set the position for a list of servos."""
-        self.set_follower_servo_positions_to_starting_positions()
-        self.set_leader_servo_positions_to_starting_positions()
-
     def set_follower_servo_positions_to_starting_positions(self) -> None:
         """Set the position for a list of servos."""
         for servo_id, position in self.FOLLOWER_STARTING_POSITIONS.items():

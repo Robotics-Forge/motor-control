@@ -163,8 +163,11 @@ def handle_teleoperation(controller, client_socket):
 
     def on_button_press():
         print("Reset command sent")
+        controller.set_leader_servo_positions_to_starting_positions()
+        time.sleep(3)
+
         client_socket.sendall("RESET\n".encode('utf-8'))
-        controller.set_servo_positions_to_starting_positions()
+        time.sleep(3)
 
     reset_button.when_pressed = on_button_press
 
