@@ -162,11 +162,12 @@ def handle_teleoperation(controller, client_socket):
     print("Reset button initialized on GPIO 21")
 
     def on_button_press():
-        print("Reset command sent")
+        print("Reset command pressed")
         controller.set_leader_servo_positions_to_starting_positions()
         time.sleep(3)
 
-        client_socket.sendall("RESET\n".encode('utf-8'))
+        print("Reset command sent")
+        client_socket.sendall("{'all': 'RESET'}\n".encode('utf-8'))
         time.sleep(3)
 
     reset_button.when_pressed = on_button_press
