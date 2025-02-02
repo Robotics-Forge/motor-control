@@ -170,7 +170,7 @@ class MotorController:
         for servo_id, position in self.LEADER_STARTING_POSITIONS.items():
             self.tuna.writeReg(servo_id, self.GOAL_POSITION_REG, position)
 
-        time.sleep(5) # Wait 5 seconds for the motors to move
+        time.sleep(3) # Wait 5 seconds for the motors to move
 
         for leader_id, follower_id in self.SERVO_MAP.items():
             self.tuna.writeReg(leader_id, self.TORQUE_ENABLE_REG, 0) # Disable Torque
