@@ -165,9 +165,12 @@ def handle_teleoperation(controller, client_socket):
     def on_button_pressed():
         print("Button press detected!")  # Debug print before sending
         try:
+            print("Reset command sent")
+
             # Send RESET command
             client_socket.sendall("RESET\n".encode('utf-8'))
-            print("Reset command sent")
+            controller.set_servo_positions_to_starting_positions()
+            time.sleep(3)
         except socket.error as e:
             print(f"Failed to send reset command: {e}")
 
