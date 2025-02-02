@@ -166,13 +166,11 @@ def handle_teleoperation(controller, client_socket):
 
     def on_button_press():
         nonlocal last_reset
-        print("Reset command pressed")
-        controller.set_leader_servo_positions_to_starting_positions()
-        time.sleep(3)
 
-        print("Reset command sent")
-        client_socket.sendall("{'all': 'RESET'}\n".encode('utf-8'))
+        print("Reset command pressed")
         last_reset = time.time()  # Store the time of reset
+        controller.set_leader_servo_positions_to_starting_positions()
+        client_socket.sendall("{'all': 'RESET'}\n".encode('utf-8'))
 
     reset_button.when_pressed = on_button_press
 
