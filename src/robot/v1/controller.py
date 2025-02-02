@@ -158,8 +158,8 @@ def handle_teleoperation(controller, client_socket):
     controller.set_leader_servo_positions_to_starting_positions()
     time.sleep(3)
 
-    # Initialize reset button on GPIO 18
-    reset_button = Button(18)
+    # Initialize reset button on GPIO 21
+    reset_button = Button(21)
 
     def on_button_pressed():
         try:
