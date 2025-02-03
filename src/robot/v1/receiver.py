@@ -130,10 +130,13 @@ def main():
                     for command in messages:
                         if time.time() % 3 < 0.1:
                             current_time = time.strftime("%H:%M:%S")
+
+                            print()
                             print(f"[{current_time}] Received command: {command}")
 
                             # Print the current positions of the servos
                             print(f"Current positions: {controller.get_servo_positions(controller.get_follower_ids())}")
+                            print()
 
                         leader_baselines = process_command(
                             controller,
