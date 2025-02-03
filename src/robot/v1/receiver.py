@@ -84,7 +84,9 @@ def process_command(controller, command, leader_baselines, follower_baselines):
         # Print details every 10 seconds
         if time.time() % 10 < 0.1:
             current_time = time.strftime("%H:%M:%S")
+            print()
             print(f"[{current_time}] Position details: {details}")
+            print()
 
     return leader_baselines
 
