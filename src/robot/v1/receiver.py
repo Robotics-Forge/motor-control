@@ -58,8 +58,9 @@ def process_command(controller, command, leader_baselines, follower_baselines):
     # Handle RESET command
     if command == "RESET" or (isinstance(command, dict) and command.get("all") == "RESET"):
         print("RESET command received")
-        controller.set_follower_servo_positions_to_starting_positions()
-        return leader_baselines
+        follower_baselines = controller.set_follower_servo_positions_to_starting_positions()
+        leader_baselines = None  # Reset leader baselines
+        return (leader_baselines, follower_baselines)
 
     # Initialize leader baselines on the first command received
     if leader_baselines is None:
@@ -81,7 +82,7 @@ def process_command(controller, command, leader_baselines, follower_baselines):
             leader_baseline=leader_baselines[leader_id]
         )
 
-    return leader_baselines
+    return (leader_baselines, follower_baselines)
 
 def main():
     selected_port = select_serial_port()
@@ -138,7 +139,7 @@ def main():
                             print(f"Current positions: {controller.get_servo_positions(controller.get_follower_ids())}")
                             print()
 
-                        leader_baselines = process_command(
+                        leader_baselines, follower_baselines = process_command(
                             controller,
                             command,
                             leader_baselines,
