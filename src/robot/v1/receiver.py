@@ -64,10 +64,10 @@ def process_command(controller, command, leader_baselines, follower_baselines):
 
     # Initialize leader baselines on the first command received
     if leader_baselines is None:
-        return {
+        return ({
             leader_id: position
             for leader_id, position in command.items()
-        }
+        }, follower_baselines)
 
     # Update follower servos based on deltas
     for leader_id, leader_new_position in command.items():
