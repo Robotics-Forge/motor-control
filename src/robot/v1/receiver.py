@@ -56,34 +56,34 @@ def process_messages(buffer):
 def process_command(controller, command, leader_baselines, follower_baselines):
     """Process a single command message and update servo positions."""
     # Handle RESET command
-    if command == "RESET" or (isinstance(command, dict) and command.get("all") == "RESET"):
+    isCommandReset = command == "RESET" or (isinstance(command, dict) and command.get("all") == "RESET")
+    if isCommandReset:
         print("RESET command received")
         follower_baselines = controller.set_follower_servo_positions_to_starting_positions()
-        leader_baselines = { # Reset leader baselines
+        leader_baselines = None # Reset leader baselines
+        return (leader_baselines, follower_baselines)
+
+    # Initialize leader baselines on the first command received
+    if leader_baselines is None and not isCommandReset:
+        leader_baselines = {
             leader_id: position
             for leader_id, position in command.items()
         }
         return (leader_baselines, follower_baselines)
 
-    # Initialize leader baselines on the first command received
-    if leader_baselines is None:
-        return ({
-            leader_id: position
-            for leader_id, position in command.items()
-        }, follower_baselines)
-
     # Update follower servos based on deltas
-    for leader_id, leader_new_position in command.items():
-        if leader_id is None:
-            continue
+    if leader_baselines is not None and not isCommandReset:
+        for leader_id, leader_new_position in command.items():
+            if leader_id is None:
+                continue
 
-        follower_id = controller.get_follower_id(leader_id)
-        success, details = controller.update_follower_position(
-            follower_id=follower_id,
-            follower_baseline=follower_baselines[follower_id],
-            leader_position=leader_new_position,
-            leader_baseline=leader_baselines[leader_id]
-        )
+            follower_id = controller.get_follower_id(leader_id)
+            success, details = controller.update_follower_position(
+                follower_id=follower_id,
+                follower_baseline=follower_baselines[follower_id],
+                leader_position=leader_new_position,
+                leader_baseline=leader_baselines[leader_id]
+            )
 
     return (leader_baselines, follower_baselines)
 
@@ -151,6 +151,7 @@ def main():
 
                 except Exception as e:
                     print(f"Error in main loop: {e}")
+                    print(f"Error occurred on line {sys.exc_info()[2].tb_lineno}")
                     buffer = ""  # Clear buffer on error
 
     except KeyboardInterrupt:
