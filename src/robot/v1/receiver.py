@@ -150,8 +150,19 @@ def main():
                         )
 
                 except Exception as e:
+                    import traceback
                     print(f"Error in main loop: {e}")
-                    print(f"Error occurred on line {sys.exc_info()[2].tb_lineno}")
+
+                    # Get the stack trace
+                    tb = traceback.extract_tb(sys.exc_info()[2])
+
+                    # Print only frames from our code (excluding library code)
+                    print("\nStack trace:")
+                    for frame in tb:
+                        if "receiver.py" in frame.filename:
+                            print(f"  File '{frame.filename}', line {frame.lineno}, in {frame.name}")
+                            print(f"    {frame.line}")
+
                     buffer = ""  # Clear buffer on error
 
     except KeyboardInterrupt:
