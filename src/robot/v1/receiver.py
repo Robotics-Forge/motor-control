@@ -81,6 +81,11 @@ def process_command(controller, command, leader_baselines, follower_baselines):
             leader_baseline=leader_baselines[leader_id]
         )
 
+        # Print details every 3 seconds
+        if time.time() % 3 < 0.1:
+            current_time = time.strftime("%H:%M:%S")
+            print(f"[{current_time}] Position details: {details}")
+
     return leader_baselines
 
 def main():
