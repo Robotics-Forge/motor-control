@@ -59,7 +59,10 @@ def process_command(controller, command, leader_baselines, follower_baselines):
     if command == "RESET" or (isinstance(command, dict) and command.get("all") == "RESET"):
         print("RESET command received")
         follower_baselines = controller.set_follower_servo_positions_to_starting_positions()
-        leader_baselines = None  # Reset leader baselines
+        leader_baselines = { # Reset leader baselines
+            leader_id: position
+            for leader_id, position in command.items()
+        }
         return (leader_baselines, follower_baselines)
 
     # Initialize leader baselines on the first command received
