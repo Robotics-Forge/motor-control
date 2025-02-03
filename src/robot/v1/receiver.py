@@ -81,13 +81,6 @@ def process_command(controller, command, leader_baselines, follower_baselines):
             leader_baseline=leader_baselines[leader_id]
         )
 
-        # Print details every 10 seconds
-        if time.time() % 10 < 0.1:
-            current_time = time.strftime("%H:%M:%S")
-            print()
-            print(f"[{current_time}] Position details: {details}")
-            print()
-
     return leader_baselines
 
 def main():
@@ -138,6 +131,9 @@ def main():
                         if time.time() % 3 < 0.1:
                             current_time = time.strftime("%H:%M:%S")
                             print(f"[{current_time}] Received command: {command}")
+
+                            # Print the current positions of the servos
+                            print(f"Current positions: {controller.get_servo_positions(controller.get_follower_ids())}")
 
                         leader_baselines = process_command(
                             controller,
